@@ -1,0 +1,46 @@
+{
+  "root": true,
+  "parserOptions": {
+    "parser": "babel-eslint"
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "process": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:vue/recommended",
+    "google"
+  ],
+  "plugins": [
+    "vue"
+  ],
+  "rules": {
+    "require-jsdoc": "off",
+    "generator-star-spacing": "off",
+    "no-debugger": "off",
+    "max-len": [
+      "error",
+      {
+        "code": 120
+      }
+    ],
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "vue/max-attributes-per-line": [
+      2,
+      {
+        "singleline": 5,
+        "multiline": {
+          "max": 1,
+          "allowFirstLine": false
+        }
+      }
+    ]
+  }
+}
