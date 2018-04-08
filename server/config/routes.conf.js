@@ -14,7 +14,7 @@ module.exports = class RouteConfig {
     let _root = process.cwd();
     let _nodeModules = "/node_modules/";
     let _jspmPackages = "/jspm_packages/";
-    let _clientFiles = (process.env.NODE_ENV === "production") ? "/client/dist/" : "/client/dev/";
+    let _clientFiles = "/../client/dist/";
 
     application.use(compression({
       level: zlib.Z_BEST_COMPRESSION,
