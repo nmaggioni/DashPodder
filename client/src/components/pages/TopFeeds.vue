@@ -1,15 +1,15 @@
 <template lang="pug">
   .main
-    FeedsTop
+    TopFeedsList
 </template>
 
 <script>
-  import FeedsTop from '@components/FeedsTop';
+  import TopFeedsList from '@components/TopFeedsList';
 
   export default {
-    name: 'Home',
+    name: 'TopFeeds',
     components: {
-      FeedsTop,
+      TopFeedsList,
     },
     data: function() {
       return {

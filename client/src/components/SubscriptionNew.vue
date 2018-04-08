@@ -10,7 +10,7 @@
       div(v-else)
         p Subscribed successfully!
     div
-      form.uk-form-horizontal.uk-grid-small.uk-text-center(uk-grid action='#' @submit='subscribeToFeed')
+      form.uk-form-horizontal.uk-grid-small.uk-text-center(uk-grid @submit.prevent='subscribeToFeed')
         fieldset.uk-fieldset.uk-width-1-3.uk-container-center
           label.uk-form-label(for='newFeedName') Name
           .uk-form-controls
@@ -27,7 +27,7 @@
 
 <script>
   export default {
-    name: 'FeedSubscribe',
+    name: 'SubscriptionNew',
     data: function() {
       return {
         newFeedName: '',
@@ -51,8 +51,7 @@
       },
     },
     methods: {
-      subscribeToFeed(e) {
-        e.preventDefault();
+      subscribeToFeed() {
         this.loading = true;
         this.errors = [];
         if (!this.newFeedName) {
@@ -91,12 +90,15 @@
 <style scoped lang="stylus">
   h2
     margin-bottom 30px
+
   .uk-form-label
     font-size 1em
     margin-top 10px
     width 100px
+
   .uk-form-controls
     margin-left 100px
+
   .uk-alert
     width 300px
     margin auto
@@ -104,10 +106,12 @@
     p
       margin-bottom 0
       margin-right 30px
+
   .uk-alert-close
     top 10px
     &:after
       display none
+
   .uk-spinner
     margin-left 15px
 </style>

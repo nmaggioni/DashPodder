@@ -1,15 +1,15 @@
 <template lang="pug">
   .main
-    FeedsList
+    SubscriptionsList
 </template>
 
 <script>
-  import FeedsList from '@components/FeedsList';
+  import SubscriptionsList from '@components/SubscriptionsList';
 
   export default {
-    name: 'Home',
+    name: 'Subscriptions',
     components: {
-      FeedsList,
+      SubscriptionsList,
     },
     data: function() {
       return {

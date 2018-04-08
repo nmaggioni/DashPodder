@@ -19,10 +19,31 @@ module.exports = class UtilityController {
       });
   }
 
-  static toplistGpodderNet(req, res) {
-    let amount = req.params.amount || '50';
+  static toplist(req, res) {
+    let amount = String(Math.abs(parseInt(req.params.amount)) || 50);
 
     https.get(`https://gpodder.net/toplist/${amount}.json`, (gpodderRes) => {
+      let body = '';
+
+      gpodderRes
+        .setEncoding('utf8')
+        .on('data', (data) => {
+          body += data;
+        })
+        .on('end', () => {
+          res.status(200).json(JSON.parse(body));
+        })
+        .on('error', (err) => {
+          // console.error(err);
+          res.status(500).end();
+        });
+    });
+  }
+
+  static search(req, res) {
+    let query = decode(req.params.query);
+
+    https.get(`https://gpodder.net/search.json?q=${query}`, (gpodderRes) => {
       let body = '';
 
       gpodderRes

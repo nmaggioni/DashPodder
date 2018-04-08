@@ -3,7 +3,7 @@ import Router from 'vue-router';
 import PageSubscriptions from '@pages/Subscriptions';
 import PageTopFeeds from '@pages/TopFeeds';
 import PageSearch from '@pages/Search';
-import PageFeed from '@pages/Feed';
+import PageFeedDetails from '@pages/FeedDetails';
 
 Vue.use(Router);
 
@@ -28,7 +28,7 @@ export default new Router({
     {
       path: '/feed',
       name: 'Feed',
-      component: PageFeed,
+      component: PageFeedDetails,
     },
   ],
 });

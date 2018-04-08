@@ -17,7 +17,7 @@ module.exports = class GpodderController {
     let query = decode(req.params.query);
 
     gpodder.search(query).then(results => {
-      res.status(200).json(results);
+      res.status(results.length ? 200 : 204).json(results);
     }).catch(err => {
       res.status(500).json(err);
     });

@@ -7,24 +7,18 @@
       fieldset.uk-fieldset
         label.uk-form-label.uk-text-meta(for='topAmount') No. of entries to show:
         .uk-form-controls
-          input.uk-input(id='topAmount' type='number' v-model.number.lazy='numberOfEntries' min='1' max='100')
-    table.uk-table.centered
-      tr
-        th #
-        th Name
-        th Description
-        th Website
-      tr(v-for='(feed, i) in feeds', :key='i')
-        td.uk-text-muted.index(v-text='i+1')
-        td.uk-text-bold.trimmed-title(v-text='feed.title')
-        td.uk-text-truncate(v-text='feed.description')
-        td.uk-text-truncate
-          a(:href='feed.website', v-text='feed.website')
+          input.uk-input#topAmount(type='number' v-model.number.lazy='numberOfEntries' min='1' max='100')
+    FeedsTable(:feeds='feeds')
 </template>
 
 <script>
+  import FeedsTable from '@components/FeedsTable';
+
   export default {
-    name: 'FeedsTop',
+    name: 'TopFeedsList',
+    components: {
+      FeedsTable,
+    },
     data: function() {
       return {
         loading: true,
@@ -41,7 +35,11 @@
     watch: {
       numberOfEntries: function(newVal, oldVal) {
         if (newVal === oldVal || !newVal) return;
-        newVal = newVal > 100 ? 100 : newVal;
+        if (newVal <= 0) {
+          newVal = 1;
+        } else if (newVal > 100) {
+          newVal = 100;
+        }
         this.numberOfEntries = newVal;
 
         if (newVal < oldVal) {
@@ -60,7 +58,7 @@
     methods: {
       getAll() {
         this.loading = true;
-        this.$http.get(`util/toplistgpoddernet/${this.numberOfEntries}`)
+        this.$http.get(`util/toplist/${this.numberOfEntries}`)
           .then((feeds) => {
             return feeds.json();
           })

@@ -7,11 +7,15 @@ module.exports = class GpodderRoutes {
       .get(UtilityController.parseFeedInfo);
 
     router
-      .route('/api/util/toplistgpoddernet')
-      .get(UtilityController.toplistGpodderNet);
+      .route('/api/util/toplist')
+      .get(UtilityController.toplist);
 
     router
-      .route('/api/util/toplistgpoddernet/:amount')
-      .get(UtilityController.toplistGpodderNet);
+      .route('/api/util/toplist/:amount')
+      .get(UtilityController.toplist);
+
+    router
+      .route('/api/util/search/:query')
+      .get(UtilityController.search);
   }
 };

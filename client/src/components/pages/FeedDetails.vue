@@ -3,17 +3,17 @@
     h1.inline(v-text="title")
     img.logo(:src="image" width="150px" alt="Feed logo")
     FeedRename(:feedUrl="url" :feedTitle="title" @refresh="getFeedInfo")
-    FeedEpisodes(:episodes="episodes")
+    EpisodesList(:episodes="episodes")
 </template>
 
 <script>
-  import FeedEpisodes from '@components/FeedEpisodes';
+  import EpisodesList from '@components/EpisodesList';
   import FeedRename from '@components/FeedRename';
 
   export default {
-    name: 'Feed',
+    name: 'FeedDetails',
     components: {
-      FeedEpisodes,
+      EpisodesList,
       FeedRename,
     },
     data: function() {

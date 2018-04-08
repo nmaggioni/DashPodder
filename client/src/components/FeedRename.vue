@@ -1,5 +1,5 @@
 <template lang="pug">
-  form(action='#', @submit='renameFeed')
+  form(@submit.prevent='renameFeed')
     div(v-if='errors.length')
       p
         b Please correct the following error(s):
@@ -30,8 +30,7 @@
       };
     },
     methods: {
-      renameFeed(e) {
-        e.preventDefault();
+      renameFeed() {
         this.errors = [];
         if (!this.newFeedName.length) {
           this.errors.push('New feed name required.');

@@ -41,7 +41,7 @@ async function search(query) {
   let gpo = await run('gpo', ['search', '"' + query + '"']);
   let lines = splitAndClean(gpo.stdout);
   if (!lines.length) {
-    throw new Error("gpo did not output anything");
+    return [];
   } else if (!lines[0].startsWith('http')) {
     throw new Error(
       `gpo did not output a successful message: ${lines[0].replace('\n', '')}`

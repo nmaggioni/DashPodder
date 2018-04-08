@@ -1,31 +1,32 @@
 <template lang="pug">
-  .feeds-list
+  div
     .uk-card.uk-card-default.uk-card-body
       .heading-with-spinner
         h1.uk-text-center Your subscriptions
         div(uk-spinner="ratio: 1" v-if="loading")
-      table.uk-table.centered
-        tr
-          th #
-          th Name
-          th URL
-        tr(v-for='(feedUrl, feedName, i) in feeds', :key='i')
-          td(v-text='i+1')
-          td
-            router-link(:to="{ path: '/feed', query: { url: feedUrl }}", v-text='feedName')
-          td(v-text='feedUrl')
-      p(v-if="noFeeds") You have no subscriptions.
+      .uk-overflow-auto
+        table.uk-table.uk-table-hover.centered
+          tr
+            th #
+            th Name
+            th URL
+          tr(v-for='(feedUrl, feedName, i) in feeds', :key='i')
+            td(v-text='i+1')
+            td
+              router-link(:to="{ path: '/feed', query: { url: feedUrl }}", v-text='feedName')
+            td(v-text='feedUrl')
+        p(v-if="noFeeds") You have no subscriptions.
     .uk-card.uk-card-default.uk-card-body
-      FeedSubscribe.uk-align-center(@refresh='getAll')
+      SubscriptionNew.uk-align-center(@refresh='getAll')
 </template>
 
 <script>
-  import FeedSubscribe from '@components/FeedSubscribe';
+  import SubscriptionNew from '@components/SubscriptionNew';
 
   export default {
-    name: 'FeedsList',
+    name: 'SubscriptionsList',
     components: {
-      FeedSubscribe,
+      SubscriptionNew,
     },
     data: function() {
       return {

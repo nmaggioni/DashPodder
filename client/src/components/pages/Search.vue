@@ -1,15 +1,15 @@
 <template lang="pug">
   .main
-    FeedsSearch
+    SearchFeeds
 </template>
 
 <script>
-  import FeedsSearch from '@components/FeedsSearch';
+  import SearchFeeds from '@components/SearchFeeds';
 
   export default {
-    name: 'Home',
+    name: 'Search',
     components: {
-      FeedsSearch,
+      SearchFeeds,
     },
     data: function() {
       return {
