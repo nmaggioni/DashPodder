@@ -7,7 +7,7 @@
       fieldset.uk-fieldset
         label.uk-form-label.uk-text-meta(for='topAmount') No. of entries to show:
         .uk-form-controls
-          input.uk-form-input(id='topAmount' type='number' v-model.number.lazy='numberOfEntries' min='1' max='100')
+          input.uk-input(id='topAmount' type='number' v-model.number.lazy='numberOfEntries' min='1' max='100')
     table.uk-table.centered
       tr
         th #
@@ -88,9 +88,12 @@
     margin-bottom 15px
     .uk-form-label
       width 125px
-      margin-top 3px
+      margin-top 7px
     .uk-form-controls
       margin-left 135px
       input
-        width 40px
+        width 55px
+        height 30px
+        padding-left 5px
+        padding-right 5px
 </style>
