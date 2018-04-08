@@ -16,7 +16,7 @@
           th Description
           th Website
         tr(v-for='(feed, i) in feeds', :key='i')
-          td.uk-text-muted(v-text='i+1')
+          td.uk-text-muted.index(v-text='i+1')
           td.uk-text-bold.trimmed-title(v-text='feed.title')
           td.uk-text-truncate(v-text='feed.description')
           td.uk-text-truncate
@@ -74,6 +74,9 @@
 </script>
 
 <style scoped lang="stylus">
+  .index
+    width 30px
+
   .trimmed-title
     white-space nowrap
     overflow hidden
