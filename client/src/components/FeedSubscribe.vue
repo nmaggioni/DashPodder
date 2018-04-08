@@ -1,10 +1,14 @@
 <template lang="pug">
   div
-    .uk-text-center.uk-text-error(v-if='errors.length')
+    div(v-if='shouldShowBanner' :class="bannerClass" uk-alert="duration: 200")
+      button.uk-alert-close(type="button" uk-close)
+      div(v-if="errors.length")
         p
           b Please correct the following error(s):
         ul
           li(v-for='error in errors' :key='error') {{ error }}
+      div(v-else)
+        p Subscribed successfully!
     div
       form.uk-form-horizontal.uk-grid-small.uk-text-center(uk-grid action='#' @submit='subscribeToFeed')
         fieldset.uk-fieldset.uk-width-1-3.uk-container-center
@@ -28,7 +32,21 @@
         newFeedName: '',
         newFeedURL: '',
         errors: [],
+        success: false,
       };
+    },
+    computed: {
+      shouldShowBanner: function() {
+        return this.errors.length || this.success;
+      },
+      bannerClass: function() {
+        if (this.errors.length) {
+          return 'uk-alert-danger';
+        } else if (this.success) {
+          return 'uk-alert-success';
+        }
+        return 'uk-alert-primary';
+      },
     },
     methods: {
       subscribeToFeed(e) {
@@ -49,11 +67,14 @@
 
         this.$http.get(`gpo/subscribe/${btoa(this.newFeedURL)}/${btoa(this.newFeedName)}`)
           .then(() => {
-            window.alert('Subscribed successfully');
+            this.success = true;
+            setTimeout(() => {
+              this.success = false;
+            }, 1500);
             this.$emit('refresh');
           })
           .catch(() => {
-            window.alert('Subscribed UNsuccessfully');
+            this.errors.push('Something went wrong.');
           });
         return true;
       },
