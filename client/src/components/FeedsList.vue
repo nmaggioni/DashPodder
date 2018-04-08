@@ -15,8 +15,7 @@
             router-link(:to="{ path: '/feed', query: { url: feedUrl }}", v-text='feedName')
           td(v-text='feedUrl')
       p(v-if="noFeeds") You have no subscriptions.
-    .feed-subscribe.uk-card.uk-card-default.uk-card-body
-      h2.uk-text-center Add a new subscription
+    .uk-card.uk-card-default.uk-card-body
       FeedSubscribe.uk-align-center(@refresh='getAll')
 </template>
 
