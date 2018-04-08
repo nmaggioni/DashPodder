@@ -1,26 +1,25 @@
 <template lang="pug">
-  .feeds-list
-    .uk-card.uk-card-default.uk-card-body
-      .heading-with-spinner
-        h1.uk-text-center Top feeds
-        div(uk-spinner="ratio: 1" v-if="loadingOrParsing")
-      form.uk-form-horizontal.amount-form(@submit.prevent='')
-        fieldset.uk-fieldset
-          label.uk-form-label.uk-text-meta(for='topAmount') No. of entries to show:
-          .uk-form-controls
-            input.uk-form-input(id='topAmount' type='number' v-model.number='numberOfEntries')
-      table.uk-table.centered
-        tr
-          th #
-          th Name
-          th Description
-          th Website
-        tr(v-for='(feed, i) in feeds', :key='i')
-          td.uk-text-muted.index(v-text='i+1')
-          td.uk-text-bold.trimmed-title(v-text='feed.title')
-          td.uk-text-truncate(v-text='feed.description')
-          td.uk-text-truncate
-            a(:href='feed.website', v-text='feed.website')
+  .uk-card.uk-card-default.uk-card-body
+    .heading-with-spinner
+      h1.uk-text-center Top feeds
+      div(uk-spinner="ratio: 1" v-if="loadingOrParsing")
+    form.uk-form-horizontal.amount-form(@submit.prevent='')
+      fieldset.uk-fieldset
+        label.uk-form-label.uk-text-meta(for='topAmount') No. of entries to show:
+        .uk-form-controls
+          input.uk-form-input(id='topAmount' type='number' v-model.number.lazy='numberOfEntries' min='1' max='100')
+    table.uk-table.centered
+      tr
+        th #
+        th Name
+        th Description
+        th Website
+      tr(v-for='(feed, i) in feeds', :key='i')
+        td.uk-text-muted.index(v-text='i+1')
+        td.uk-text-bold.trimmed-title(v-text='feed.title')
+        td.uk-text-truncate(v-text='feed.description')
+        td.uk-text-truncate
+          a(:href='feed.website', v-text='feed.website')
 </template>
 
 <script>
@@ -42,7 +41,8 @@
     watch: {
       numberOfEntries: function(newVal, oldVal) {
         if (newVal === oldVal || !newVal) return;
-        newVal = newVal > 999 ? 999 : newVal;
+        newVal = newVal > 100 ? 100 : newVal;
+        this.numberOfEntries = newVal;
 
         if (newVal < oldVal) {
           while (newVal < oldVal) {
