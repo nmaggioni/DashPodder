@@ -1,5 +1,6 @@
-const { decode } = require('../../../constants/base64');
+const https = require('https');
 const Parser = require('rss-parser');
+const { decode } = require('../../../constants/base64');
 
 module.exports = class UtilityController {
   static parseFeedInfo(req, res) {
@@ -16,5 +17,26 @@ module.exports = class UtilityController {
         // console.error(err);
         res.status(204).end();
       });
+  }
+
+  static toplistGpodderNet(req, res) {
+    let amount = req.params.amount || '50';
+
+    https.get(`https://gpodder.net/toplist/${amount}.json`, (gpodderRes) => {
+      let body = '';
+
+      gpodderRes
+        .setEncoding('utf8')
+        .on('data', (data) => {
+          body += data;
+        })
+        .on('end', () => {
+          res.status(200).json(JSON.parse(body));
+        })
+        .on('error', (err) => {
+          // console.error(err);
+          res.status(500).end();
+        });
+    });
   }
 };

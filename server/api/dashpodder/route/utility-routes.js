@@ -5,5 +5,13 @@ module.exports = class GpodderRoutes {
     router
       .route('/api/util/parsefeedinfo/:url')
       .get(UtilityController.parseFeedInfo);
+
+    router
+      .route('/api/util/toplistgpoddernet')
+      .get(UtilityController.toplistGpodderNet);
+
+    router
+      .route('/api/util/toplistgpoddernet/:amount')
+      .get(UtilityController.toplistGpodderNet);
   }
 };
