@@ -60,4 +60,47 @@ module.exports = class UtilityController {
         });
     });
   }
+
+  static feedinfo(req, res) {
+    let url = decode(req.params.url);
+
+    https.get(`https://gpodder.net/api/2/data/podcast.json?url=${url}`, (gpodderRes) => {
+      let body = '';
+
+      gpodderRes
+        .setEncoding('utf8')
+        .on('data', (data) => {
+          body += data;
+        })
+        .on('end', () => {
+          res.status(200).json(JSON.parse(body));
+        })
+        .on('error', (err) => {
+          // console.error(err);
+          res.status(500).end();
+        });
+    });
+  }
+
+  static episodeinfo(req, res) {
+    let podcastUrl = decode(req.params.podcasturl);
+    let episodeUrl = decode(req.params.episodeurl);
+
+    https.get(`https://gpodder.net/api/2/data/episode.json?podcast=${podcastUrl}&url=${episodeUrl}`, (gpodderRes) => {
+      let body = '';
+
+      gpodderRes
+        .setEncoding('utf8')
+        .on('data', (data) => {
+          body += data;
+        })
+        .on('end', () => {
+          res.status(200).json(JSON.parse(body));
+        })
+        .on('error', (err) => {
+          // console.error(err);
+          res.status(500).end();
+        });
+    });
+  }
 };

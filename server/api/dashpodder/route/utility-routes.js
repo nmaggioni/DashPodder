@@ -17,5 +17,13 @@ module.exports = class GpodderRoutes {
     router
       .route('/api/util/search/:query')
       .get(UtilityController.search);
+
+    router
+      .route('/api/util/feedinfo/:url')
+      .get(UtilityController.feedinfo);
+
+    router
+      .route('/api/util/episodeinfo/:podcasturl/:episodeurl')
+      .get(UtilityController.episodeinfo);
   }
 };
