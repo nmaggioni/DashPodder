@@ -1,7 +1,6 @@
 <template lang="pug">
   div
     div(v-if='shouldShowBanner' :class="bannerClass" uk-alert="duration: 200")
-      button.uk-alert-close(type="button" uk-close)
       div(v-if="errors.length")
         p
           b Please correct the following error(s):
@@ -54,16 +53,14 @@
         this.errors = [];
         if (!this.newFeedName) {
           this.errors.push('Feed name required.');
-          return false;
         }
         if (!this.newFeedURL) {
           this.errors.push('Feed URL required.');
-          return false;
         }
-        if (!/^http(?:s)?:\/\//.test(this.newFeedURL)) {
+        if (this.newFeedURL && !/^http(?:s)?:\/\//.test(this.newFeedURL)) {
           this.errors.push('Feed URL does not look like an HTTP(S) URL.');
-          return false;
         }
+        if (this.errors.length) return false;
 
         this.$http.get(`gpo/subscribe/${btoa(this.newFeedURL)}/${btoa(this.newFeedName)}`)
           .then(() => {
