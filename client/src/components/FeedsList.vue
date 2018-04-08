@@ -30,7 +30,7 @@
     data: function() {
       return {
         loading: true,
-        feeds: [],
+        feeds: {},
       };
     },
     computed: {
