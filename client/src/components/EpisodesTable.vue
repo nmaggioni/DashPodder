@@ -7,7 +7,7 @@
         th.uk-table-shrink Status
       tbody
         tr(v-for='(episode, i) in episodes' :key='i')
-          td.uk-text-muted(v-text='i+1')
+          td.uk-text-muted(v-text='i + 1 + indexOffset')
           td.uk-text-bold.uk-text-truncate(v-text='episode.title')
           td.uk-text-capitalize(v-text='episode.status')
 </template>
@@ -19,6 +19,11 @@
       episodes: {
         type: Array,
         required: true,
+      },
+      indexOffset: {
+        type: Number,
+        required: false,
+        default: 0,
       },
     },
   };

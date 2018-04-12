@@ -2013,6 +2013,7 @@ html:not(.uk-touch) .uk-nav-offcanvas ul a:hover {
   border-radius: 4px
 }
 
+/*
 .uk-pagination > li > a {
   background: #f7f7f7;
   color: #666;
@@ -2057,6 +2058,7 @@ html:not(.uk-touch) .uk-nav-offcanvas ul a:hover {
   border: 1px solid rgba(0, 0, 0, .2);
   text-shadow: 0 1px 0 #fff
 }
+*/
 
 .uk-pagination-previous {
   float: left
