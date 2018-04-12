@@ -3,10 +3,6 @@ const UtilityController = require('../controller/utility-controller');
 module.exports = class GpodderRoutes {
   static init(router) {
     router
-      .route('/api/util/parsefeedinfo/:url')
-      .get(UtilityController.parseFeedInfo);
-
-    router
       .route('/api/util/toplist')
       .get(UtilityController.toplist);
 
@@ -21,6 +17,10 @@ module.exports = class GpodderRoutes {
     router
       .route('/api/util/feedinfo/:url')
       .get(UtilityController.feedinfo);
+
+    router
+      .route('/api/util/feedinfoparse/:url')
+      .get(UtilityController.feedinfoparse);
 
     router
       .route('/api/util/feedinfoscrape/:mygpourl')

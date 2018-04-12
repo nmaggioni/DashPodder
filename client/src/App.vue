@@ -17,7 +17,7 @@
 
       router-view
 
-    #offcanvas.uk-offcanvas
+    //#offcanvas.uk-offcanvas
     .uk-offcanvas-bar
       ul.uk-nav.uk-nav-offcanvas
         +navbar_items

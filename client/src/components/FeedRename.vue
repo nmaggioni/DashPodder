@@ -1,13 +1,12 @@
 <template lang="pug">
-  form(@submit.prevent='renameFeed')
+  form.uk-form(@submit.prevent='renameFeed')
     div(v-if='errors.length')
       p
         b Please correct the following error(s):
       ul
         li(v-for='error in errors', :key='error') {{ error }}
-    span Rename this feed:
-    input#newFeedName(v-model='newFeedName', :placeholder='feedTitle', type='text')
-    input(type='submit', value='Rename')
+    input.uk-width-1-2#newFeedName(type='text' :placeholder='newFeedName' v-model='newFeedName')
+    input.uk-button.uk-margin-left(type='submit' value='Rename')
 </template>
 
 <script>
@@ -25,7 +24,7 @@
     },
     data: function() {
       return {
-        newFeedName: '',
+        newFeedName: this.feedTitle,
         errors: [],
       };
     },
@@ -39,12 +38,10 @@
 
         this.$http.get(`gpo/rename/${btoa(this.feedUrl)}/${btoa(this.newFeedName)}`)
           .then(() => {
-            window.alert('Renamed successfully');
-            this.newFeedName = '';
-            this.$emit('refresh');
+            this.$emit('renameDone');
           })
-          .catch(() => {
-            window.alert('Renamed UNsuccessfully');
+          .catch((err) => {
+            this.$emit('renameDone', err);
           });
         return true;
       },

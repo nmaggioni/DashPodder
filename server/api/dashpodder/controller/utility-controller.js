@@ -13,22 +13,6 @@ function chooseProtocol(url) {
 */
 
 module.exports = class UtilityController {
-  static parseFeedInfo(req, res) {
-    let url = decode(req.params.url);
-
-    let parser = new Parser({
-      headers: { 'Accept': 'application/rss+xml,application/rss,application/xml' },
-    });
-    parser.parseURL(url)
-      .then((feed) => {
-        res.status(200).json({ title: feed.title, image: feed['itunes']['image'] });
-      })
-      .catch((err) => {
-        // console.error(err);
-        res.status(204).end();
-      });
-  }
-
   static toplist(req, res) {
     let amount = String(Math.abs(parseInt(req.params.amount)) || 50);
 
@@ -92,6 +76,26 @@ module.exports = class UtilityController {
     });
   }
 
+  static feedinfoparse(req, res) {
+    let url = decode(req.params.url);
+
+    let parser = new Parser({
+      headers: { 'Accept': 'application/rss+xml,application/rss,application/xml' },
+    });
+    parser.parseURL(url)
+      .then((feed) => {
+        res.status(200).json({
+          title: feed.title,
+          description: feed.description,
+          image: feed['itunes']['image'],
+        });
+      })
+      .catch((err) => {
+        // console.error(err);
+        res.status(204).end();
+      });
+  }
+
   static feedinfoscrape(req, res) {
     let mygpourl = decode(req.params.mygpourl);
 
@@ -105,8 +109,11 @@ module.exports = class UtilityController {
         })
         .on('end', () => {
           const dom = new JSDOM(body);
-          let publisher = dom.window.document.querySelector('small.description').childNodes[0].nodeValue
-            .replace('·', '').replace(/\n/g, ' ').replace(/^\s*by/, '').replace(/\s\s+/g, '');
+          let publisher = dom.window.document.querySelector('small.description');
+          if (publisher) {
+            publisher = publisher.childNodes[0].nodeValue
+              .replace('·', '').replace(/\n/g, ' ').replace(/^\s*by/, '').replace(/\s\s+/g, '');
+          }
           let tags = [];
           dom.window.document.querySelectorAll('span.other').forEach((el) => {
             tags.push(el.innerHTML);

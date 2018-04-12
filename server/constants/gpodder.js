@@ -147,7 +147,7 @@ async function update(url) {
   if (!lines.length) {
     throw new Error("gpo did not output anything");
   }
-  return lines[lines.length - 1].match(/^\d+/) * 1;
+  return parseInt(lines[lines.length - 1].match(/^\d+/));
 }
 
 async function download(url) {
@@ -156,7 +156,7 @@ async function download(url) {
   if (!lines.length) {
     throw new Error("gpo did not output anything");
   }
-  return lines[lines.length - 1].match(/^\d+/) * 1;
+  return parseInt(lines[lines.length - 1].match(/^\d+/));
 }
 
 async function pending(url) {
@@ -165,7 +165,7 @@ async function pending(url) {
   if (!lines.length) {
     throw new Error("gpo did not output anything");
   }
-  let pendingNumber = lines[lines.length - 1].match(/^\d+/) * 1;
+  let pendingNumber = parseInt(lines[lines.length - 1].match(/^\d+/));
   lines.splice(lines.length - 1, 1);
   let feeds = {}, feedName;
   for (let i = 0; i < lines.length; i++) {

@@ -7,7 +7,7 @@
           :class='episodeLabelClass(episode.status)'
         )
           | {{ episode.status }}
-      dd {{ episode.extras.summary }}
+      dd(v-if='episode.extras') {{ episode.extras.summary }}
 
 </template>
 

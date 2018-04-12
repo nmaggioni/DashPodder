@@ -5919,11 +5919,13 @@ select.uk-form-width-mini {
   opacity: .3
 }
 
+/*
 .uk-close:after {
   display: block;
   content: "\f00d";
   font-family: FontAwesome
 }
+*/
 
 .uk-close:focus, .uk-close:hover {
   opacity: .5;

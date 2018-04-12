@@ -3,8 +3,14 @@
     .uk-grid(data-uk-grid-margin='')
       .uk-width-medium-3-4.uk-row-first
         article.uk-article
-          h1.uk-article-title
-            a(v-text='title')
+          .uk-flex.uk-flex-left.uk-flex-middle
+            h1.uk-article-title(v-text='title')
+            span(uk-icon='pencil' @click='renameFeedStart' v-if='title').uk-margin-left
+          ModalFeedRename(id='renameModal' v-if='localTitle'
+            :feedUrl='url'
+            :feedTitle='localTitle'
+            @renameDone='renameFeedDone'
+          )
           p.uk-article-meta.feed-info-subtitle
             span by {{ publisher }}
             span &middot;&nbsp;
@@ -23,26 +29,33 @@
 
 
           EpisodesTable.uk-margin-small-top(v-if='tableOrList === "table"'
-          :episodes='pagedEpisodes[currentPage]'
-          :indexOffset='episodesPerPage * currentPage'
+            :episodes='pagedEpisodes[currentPage]'
+            :indexOffset='episodesPerPage * currentPage'
           )
           EpisodesList.uk-margin-medium-top(v-else
-          :episodes='pagedEpisodes[currentPage]'
+            :episodes='pagedEpisodes[currentPage]'
           )
           Pagination.uk-margin-large-top(
-          :pages='pagedEpisodes.length - 1'
-          :currentPage='currentPage + 1'
-          @changePage='changePage'
+            :pages='pagedEpisodes.length - 1'
+            :currentPage='currentPage + 1'
+            @changePage='changePage'
           )
+
       .uk-width-medium-1-4
         .uk-panel.uk-panel-box.uk-text-center
           img.uk-border-circle(width='120' height='120' :src='logo' :alt='title + " logo"')
-          h3(v-text='title')
+          h3(v-text='localTitle')
           p.uk-text-center
             b Tags:&nbsp;
-            span(v-for='(tag, i) in tags' :key='i')
+            span(v-if='!tags.length') N/A
+            span(v-else v-for='(tag, i) in tags' :key='i')
               | {{ tag }}
               span.span-br(v-if='i !== tags.length - 1') ,&nbsp;
+        .uk-flex.uk-flex-around.uk-margin-top.uk-margin-medium-bottom
+          button#update-btn.uk-button.uk-button-large.uk-button-primary(@click='updateEpisodes') Update
+          ModalSpinner(id='updateModal' title='Updating episodes list...')
+          button#download-btn.uk-button.uk-button-large.uk-button-secondary(@click='downloadEpisodes') Download
+          ModalSpinner(id='downloadModal' title='Downloading missing episodes...')
         .uk-panel
           h3.uk-panel-title Related Links
           ul.uk-list
@@ -57,20 +70,23 @@
 <script>
   import EpisodesTable from '@components/EpisodesTable';
   import EpisodesList from '@components/EpisodesList';
-  import FeedRename from '@components/FeedRename';
+  import ModalFeedRename from '@components/ModalFeedRename';
   import Pagination from '@components/Pagination';
+  import ModalSpinner from '@components/ModalSpinner';
 
   export default {
     name: 'FeedDetails',
     components: {
       EpisodesTable,
       EpisodesList,
-      FeedRename, // TODO: implement feed renaming
+      ModalFeedRename,
       Pagination,
+      ModalSpinner,
     },
     data: function() {
       return {
         url: '',
+        localTitle: '',
         title: 'Unknown',
         publisher: 'Unknown',
         description: 'Loading...',
@@ -92,6 +108,7 @@
       if (tableOrList) this.tableOrList = tableOrList;
 
       this.url = this.$route.query.url;
+      this.localTitle = this.$route.query.title;
       if (this.url.length > 0) {
         this.getFeedInfo();
         this.getFeedEpisodes();
@@ -110,6 +127,18 @@
             this.mygpoUrl = jres.mygpo_link;
             this.website = jres.website;
 
+            if (!this.title || !this.description || !this.logo) {
+              this.$http.get(`util/feedinfoparse/${btoa(this.url)}`)
+                .then((res) => {
+                  return res.json();
+                })
+                .then((jres) => {
+                  this.title = this.title ? this.title : jres.title;
+                  this.description = this.description ? this.description : jres.description;
+                  this.logo = this.logo ? this.logo : jres.image;
+                });
+            }
+
             this.$http.get(`util/feedinfoscrape/${btoa(this.mygpoUrl)}`)
               .then((res) => {
                 return res.json();
@@ -120,26 +149,34 @@
               });
           });
       },
+      updateLocalTitle: function() {
+        this.$http.get(`gpo/info/${btoa(this.url)}`)
+          .then((res) => {
+            return res.json();
+          })
+          .then((jres) => {
+            this.localTitle = jres.title;
+          });
+      },
       getFeedEpisodes: function() {
         this.$http.get(`gpo/info/${btoa(this.url)}`)
           .then((res) => {
             return res.json();
           })
           .then((jres) => {
-            this.episodes = jres.episodes;
-            this.enrichFeedEpisodes(() => {
+            this.enrichFeedEpisodes(jres.episodes, () => {
               this.splitEpisodesInPages();
             });
           });
       },
-      enrichFeedEpisodes: function(callback) {
-        this.$http.get(`util/episodesinfoscrape/${btoa(this.url)}/${this.episodes.length}`)
+      enrichFeedEpisodes: function(episodes, callback) {
+        this.$http.get(`util/episodesinfoscrape/${btoa(this.url)}/${episodes.length}`)
           .then((res) => {
             return res.json();
           })
           .then((jres) => {
             jres.forEach((episodeInfo) => {
-              this.episodes.some((episode) => {
+              episodes.some((episode) => {
                 if (!episode.extras) {
                   if (episode.title.toLowerCase() === episodeInfo.title.toLowerCase()) {
                     episode.extras = episodeInfo;
@@ -147,7 +184,90 @@
                 }
               });
             });
+            this.episodes = episodes;
             callback();
+          });
+      },
+      renameFeedStart: function() {
+        let modal = this.$UIkit.modal(document.getElementById('renameModal'));
+        modal.show();
+      },
+      renameFeedDone: function(err) {
+        let modal = this.$UIkit.modal(document.getElementById('renameModal'));
+        modal.hide();
+        if (err) {
+          this.$UIkit.notification({
+            message: 'Error during feed rename.',
+            status: 'danger',
+            pos: 'top-center',
+            timeout: 3000,
+          });
+        } else {
+          this.$UIkit.notification({
+            message: 'Feed renamed successfully',
+            status: 'success',
+            pos: 'top-center',
+            timeout: 3000,
+          });
+        }
+        this.updateLocalTitle();
+      },
+      updateEpisodes: function() {
+        let modal = this.$UIkit.modal(document.getElementById('updateModal'));
+        modal.show();
+
+        this.$http.get(`gpo/update/${btoa(this.url)}`)
+          .then((res) => {
+            return res.json();
+          })
+          .then((jres) => {
+            modal.hide();
+            this.$UIkit.notification({
+              message: `${jres} new episodes found.`,
+              status: jres > 0 ? 'success' : 'primary',
+              pos: 'top-center',
+              timeout: 5000,
+            });
+            this.getFeedEpisodes();
+          })
+          .catch((err) => {
+            modal.hide();
+            this.$UIkit.notification({
+              message: `Error during episodes update!`,
+              status: 'danger',
+              pos: 'top-center',
+              timeout: 5000,
+            });
+            this.getFeedEpisodes();
+          });
+      },
+      downloadEpisodes: function() {
+        let modal = this.$UIkit.modal(document.getElementById('downloadModal'));
+        modal.show();
+
+        this.$http.get(`gpo/download/${btoa(this.url)}`)
+          .then((res) => {
+            return res.json();
+          })
+          .then((jres) => {
+            modal.hide();
+            this.$UIkit.notification({
+              message: `${jres} episodes downloaded.`,
+              status: jres > 0 ? 'success' : 'primary',
+              pos: 'top-center',
+              timeout: 5000,
+            });
+            this.getFeedEpisodes();
+          })
+          .catch((err) => {
+            modal.hide();
+            this.$UIkit.notification({
+              message: `Error during episodes download!`,
+              status: 'danger',
+              pos: 'top-center',
+              timeout: 5000,
+            });
+            this.getFeedEpisodes();
           });
       },
       splitEpisodesInPages: function() {
@@ -191,6 +311,7 @@
 
 <style scoped lang="stylus">
   .feed-info-subtitle
+    margin-top 5px
     .uk-icon, span
       margin-right 5px
 
@@ -201,4 +322,10 @@
     margin-top 5px
     a
       text-decoration underline
+
+  .uk-article
+    span[uk-icon]
+      cursor pointer
+    h1.uk-article-title
+      margin-bottom 0
 </style>
