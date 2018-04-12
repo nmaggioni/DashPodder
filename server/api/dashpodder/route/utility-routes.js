@@ -23,6 +23,10 @@ module.exports = class GpodderRoutes {
       .get(UtilityController.feedinfo);
 
     router
+      .route('/api/util/feedinfoscrape/:mygpourl')
+      .get(UtilityController.feedinfoscrape);
+
+    router
       .route('/api/util/episodeinfo/:podcasturl/:episodeurl')
       .get(UtilityController.episodeinfo);
   }
