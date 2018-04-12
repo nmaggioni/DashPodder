@@ -29,5 +29,13 @@ module.exports = class GpodderRoutes {
     router
       .route('/api/util/episodeinfo/:podcasturl/:episodeurl')
       .get(UtilityController.episodeinfo);
+
+    router
+      .route('/api/util/episodeinfoscrape/:podcasturl/:episodetitle')
+      .get(UtilityController.episodeinfoscrape);
+
+    router
+      .route('/api/util/episodesinfoscrape/:podcasturl/:limit?/:offset?')
+      .get(UtilityController.episodesinfoscrape);
   }
 };

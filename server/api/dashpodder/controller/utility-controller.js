@@ -144,4 +144,80 @@ module.exports = class UtilityController {
         });
     });
   }
+
+  static episodeinfoscrape(req, res) {
+    let podcastUrl = decode(req.params.podcasturl);
+    let episodeTitle = decode(req.params.episodetitle);
+
+    let parser = new Parser({
+      headers: { 'Accept': 'application/rss+xml,application/rss,application/xml' },
+    });
+    parser.parseURL(podcastUrl)
+      .then((feed) => {
+        let episodeInfo = {};
+        let found = feed.items.some((episode) => {
+          if (episode.title.toLowerCase() === episodeTitle.toLowerCase()) {
+            episodeInfo = {
+              title: episode.title,
+              subtitle: episode.itunes.subtitle,
+              creator: episode.creator,
+              date: episode.isoDate,
+              link: episode.link,
+              media: episode.enclosure.url,
+              content: episode.contentSnippet,
+              summary: episode.itunes.summary,
+              duration: episode.itunes.duration,
+              explicit: episode.itunes.explicit,
+              image: episode.itunes.image,
+            };
+            return true;
+          }
+        });
+        res.status(found ? 200 : 204).json(episodeInfo);
+      })
+      .catch((err) => {
+        // console.error(err);
+        res.status(204).end();
+      });
+  }
+
+  static episodesinfoscrape(req, res) {
+    let podcastUrl = decode(req.params.podcasturl);
+    let limit = Math.abs(parseInt(req.params.limit || 0));
+    let offset = Math.abs(parseInt(req.params.offset || 0));
+
+    let parser = new Parser({
+      headers: { 'Accept': 'application/rss+xml,application/rss,application/xml' },
+    });
+    parser.parseURL(podcastUrl)
+      .then((feed) => {
+        let episodeInfos = [];
+        if (limit > 0) {
+          if (offset > 0) {
+            feed.items = feed.items.slice(offset);
+          }
+          feed.items = feed.items.slice(0, limit);
+        }
+        feed.items.forEach((episode) => {
+          episodeInfos.push({
+            title: episode.title,
+            subtitle: episode.itunes.subtitle,
+            creator: episode.creator,
+            date: episode.isoDate,
+            link: episode.link,
+            media: episode.enclosure.url,
+            content: episode.contentSnippet,
+            summary: episode.itunes.summary,
+            duration: episode.itunes.duration,
+            explicit: episode.itunes.explicit,
+            image: episode.itunes.image,
+          });
+        });
+        res.status(episodeInfos.length ? 200 : 204).json(episodeInfos);
+      })
+      .catch((err) => {
+        // console.error(err);
+        res.status(204).end();
+      });
+  }
 };

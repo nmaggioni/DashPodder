@@ -2,9 +2,12 @@
   dl.uk-description-list.uk-description-list-divider
     template(v-for='(episode, i) in episodes')
       dt.uk-text-primary(:key='i')
-        span(v-text='episode.title')
-        span.uk-align-right.uk-text-capitalize.uk-text-muted(v-text='episode.status')
-      dd Lorem ipsum dolor sit amet
+        span {{ episode.title }}
+        span.uk-align-right.uk-text-uppercase.uk-label(
+          :class='episodeLabelClass(episode.status)'
+        )
+          | {{ episode.status }}
+      dd {{ episode.extras.summary }}
 
 </template>
 
@@ -15,6 +18,25 @@
       episodes: {
         type: Array,
         required: true,
+      },
+    },
+    methods: {
+      episodeLabelClass: function(status) {
+        let type = '';
+        switch (status) {
+          case 'new':
+            break;
+          case 'downloaded':
+            type = 'success';
+            break;
+          case 'deleted':
+            type = 'danger';
+            break;
+          case 'unknown':
+            type = 'warning';
+            break;
+        }
+        return type ? `uk-label-${type}` : '';
       },
     },
   };

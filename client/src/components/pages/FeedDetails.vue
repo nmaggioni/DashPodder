@@ -23,16 +23,16 @@
 
 
           EpisodesTable.uk-margin-small-top(v-if='tableOrList === "table"'
-            :episodes='pagedEpisodes[currentPage]'
-            :indexOffset='episodesPerPage * currentPage'
+          :episodes='pagedEpisodes[currentPage]'
+          :indexOffset='episodesPerPage * currentPage'
           )
           EpisodesList.uk-margin-medium-top(v-else
-            :episodes='pagedEpisodes[currentPage]'
+          :episodes='pagedEpisodes[currentPage]'
           )
           Pagination.uk-margin-large-top(
-            :pages='pagedEpisodes.length - 1'
-            :currentPage='currentPage + 1'
-            @changePage='changePage'
+          :pages='pagedEpisodes.length - 1'
+          :currentPage='currentPage + 1'
+          @changePage='changePage'
           )
       .uk-width-medium-1-4
         .uk-panel.uk-panel-box.uk-text-center
@@ -88,6 +88,9 @@
       this.episodesPerPage = 10;
     },
     mounted: function() {
+      let tableOrList = localStorage.getItem('episodesViewType');
+      if (tableOrList) this.tableOrList = tableOrList;
+
       this.url = this.$route.query.url;
       if (this.url.length > 0) {
         this.getFeedInfo();
@@ -124,22 +127,43 @@
           })
           .then((jres) => {
             this.episodes = jres.episodes;
-            this.pageEpisodes();
+            this.enrichFeedEpisodes(() => {
+              this.splitEpisodesInPages();
+            });
           });
       },
-      pageEpisodes: function() {
+      enrichFeedEpisodes: function(callback) {
+        this.$http.get(`util/episodesinfoscrape/${btoa(this.url)}/${this.episodes.length}`)
+          .then((res) => {
+            return res.json();
+          })
+          .then((jres) => {
+            jres.forEach((episodeInfo) => {
+              this.episodes.some((episode) => {
+                if (!episode.extras) {
+                  if (episode.title.toLowerCase() === episodeInfo.title.toLowerCase()) {
+                    episode.extras = episodeInfo;
+                  }
+                }
+              });
+            });
+            callback();
+          });
+      },
+      splitEpisodesInPages: function() {
+        let episodesPerPage = Math.floor(this.episodesPerPage);
         this.pagedEpisodes = [];
         let episodesCount = this.episodes.length;
-        if (episodesCount <= this.episodesPerPage) {
+        if (episodesCount <= episodesPerPage) {
           this.pagedEpisodes.push(this.episodes);
           return;
         }
-        let remainder = episodesCount % this.episodesPerPage;
+        let remainder = episodesCount % episodesPerPage;
         let latestIndex = 0;
         while (episodesCount > remainder) {
-          this.pagedEpisodes.push(this.episodes.slice(latestIndex, latestIndex + this.episodesPerPage));
-          episodesCount -= this.episodesPerPage;
-          latestIndex += this.episodesPerPage;
+          this.pagedEpisodes.push(this.episodes.slice(latestIndex, latestIndex + episodesPerPage));
+          episodesCount -= episodesPerPage;
+          latestIndex += episodesPerPage;
         }
         this.pagedEpisodes.push(this.episodes.slice(latestIndex));
       },
@@ -147,11 +171,19 @@
         this.currentPage = page - 1; // Pagination is 1-indexed
       },
       toggleLayout: function() {
+        let oldPageNumber = this.currentPage;
         if (this.tableOrList === 'table') {
           this.tableOrList = 'list';
+          this.episodesPerPage /= 3;
         } else {
           this.tableOrList = 'table';
+          this.episodesPerPage *= 3;
         }
+        this.splitEpisodesInPages();
+        if (oldPageNumber > this.pagedEpisodes.length - 2) {
+          this.currentPage = this.pagedEpisodes.length - 2;
+        }
+        localStorage.setItem('episodesViewType', this.tableOrList);
       },
     },
   };
