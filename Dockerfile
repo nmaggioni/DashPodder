@@ -9,13 +9,17 @@ RUN yarn run build
 
 # Bundle with backend
 FROM node:9-alpine
+VOLUME /opt/build
 ENV NODE_ENV=production
 
-WORKDIR /app
+WORKDIR /dashpodder
 COPY --from=build /client/dist ./client/dist
 COPY server ./server
-WORKDIR /app/server
+WORKDIR /dashpodder/server
 RUN yarn --production
 
-EXPOSE 3333
-CMD ["yarn", "run", "start"]
+# Export bundle
+WORKDIR /
+CMD ["tar", "-czf", "./opt/build/dashpodder.tar.gz", "./dashpodder/client", "./dashpodder/server"]
+
+### docker run -v /tmp/dashpodder-build:/opt/build dashpodder
