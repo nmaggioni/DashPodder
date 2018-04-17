@@ -9,7 +9,10 @@
         tr(v-for='(episode, i) in episodes' :key='i')
           td.uk-text-muted(v-text='i + 1 + indexOffset')
           td.uk-text-bold.uk-text-truncate(v-text='episode.title')
-          td.uk-text-capitalize(v-text='episode.status')
+          td.uk-text-uppercase
+            span.uk-align-right.uk-text-uppercase.uk-label(
+              :class='episodeLabelClass(episode.status)'
+            ) {{ episode.status }}
 </template>
 
 <script>
@@ -24,6 +27,25 @@
         type: Number,
         required: false,
         default: 0,
+      },
+    },
+    methods: {
+      episodeLabelClass: function(status) {
+        let type = '';
+        switch (status) {
+          case 'new':
+            break;
+          case 'downloaded':
+            type = 'success';
+            break;
+          case 'deleted':
+            type = 'danger';
+            break;
+          case 'unknown':
+            type = 'warning';
+            break;
+        }
+        return type ? `uk-label-${type}` : '';
       },
     },
   };
