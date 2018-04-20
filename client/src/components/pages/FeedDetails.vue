@@ -1,5 +1,6 @@
 <template lang="pug">
   .main
+    ModalSpinner(id='loadingModal' title='Getting feed details...')
     .uk-grid(data-uk-grid-margin='')
       .uk-width-medium-3-4.uk-row-first
         article.uk-article
@@ -109,13 +110,17 @@
       this.episodesPerPage = 10;
     },
     mounted: function() {
+      let modal = this.$UIkit.modal(document.getElementById('loadingModal'));
+      modal.show();
       let tableOrList = localStorage.getItem('episodesViewType');
       if (tableOrList) this.tableOrList = tableOrList;
 
       this.url = this.$route.query.url;
       this.localTitle = this.$route.query.title;
       if (this.url.length > 0) {
-        this.getFeedInfo();
+        this.getFeedInfo((function(modal) {
+          modal.hide();
+        }).bind(null, modal));
         this.getFeedEpisodes();
       }
     },
@@ -137,7 +142,7 @@
         }
         return type ? `uk-label-${type}` : '';
       },
-      getFeedInfo: function() {
+      getFeedInfo: function(callback) {
         this.$http.get(`util/feedinfo/${btoa(this.url)}`)
           .then((res) => {
             return res.json();
@@ -158,6 +163,8 @@
                   this.title = this.title ? this.title : jres.title;
                   this.description = this.description ? this.description : jres.description;
                   this.logo = this.logo ? this.logo : jres.image;
+
+                  if (callback) callback();
                 });
             }
 
