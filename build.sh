@@ -20,6 +20,12 @@ $PACKAGE_MANAGER install
 $PACKAGE_MANAGER run build
 cd ..
 
+echo -e "\n### Cleaning backend...\n"
+
+if [ -f server/constants/bin/gpo ]; then
+    rm server/constants/bin/gpo
+fi
+
 echo -e "\n### Building backend...\n"
 
 cd server
