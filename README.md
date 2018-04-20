@@ -12,7 +12,8 @@ A simple WebUI for GPodder to manage your subscriptions and downloaded episodes.
 
 ## Requirements
 
-+ GPodder must be installed and its binary `gpo` must be in _$PATH_.
++ GPodder must be installed as system-wide package.
+  - Its `gpo` dependency script will be pulled from the [upstream repo](https://github.com/gpodder/gpodder/blob/master/bin/gpo) in order to ensure that the latest episode management functionalities are present. Check [this config file](https://github.com/nmaggioni/DashPodder/blob/master/server/config/gpo.js) to specify a commit's hash to pull or choose to use the script installed at system level anyway.
 
 ## Development
 
@@ -27,7 +28,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:8080](http://localhost:8080) for the frontend; the backend will be running at [http://localhost:3333](http://localhost:3333)
+Open [http://localhost:8080](http://localhost:8080) for the frontend; the backend will be running at [http://localhost:3333](http://localhost:3333). Beware that the backend will try to serve static content _(e.g.: old manual builds, if present)_ instead of 404'ing. 
 
 ## Building / Running
 
