@@ -3,6 +3,11 @@
     template(v-for='(episode, i) in episodes')
       dt.uk-text-primary(:key='i')
         span {{ episode.title }}
+        a.uk-align-right(
+          v-if='episode.status !== "downloaded"'
+          uk-icon='icon: cloud-download'
+          @click='$emit("downloadEpisode", episode.guid)'
+        )
         span.uk-align-right.uk-text-uppercase.uk-label(
           :class='episodeLabelClass(episode.status)'
         )

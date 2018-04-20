@@ -31,9 +31,11 @@
           EpisodesTable.uk-margin-small-top(v-if='tableOrList === "table"'
             :episodes='pagedEpisodes[currentPage]'
             :indexOffset='episodesPerPage * currentPage'
+            @downloadEpisode='downloadEpisodes'
           )
           EpisodesList.uk-margin-medium-top(v-else
             :episodes='pagedEpisodes[currentPage]'
+            @downloadEpisode='downloadEpisodes'
           )
           Pagination.uk-margin-large-top(
             :pages='pagedEpisodes.length - 1'
@@ -54,8 +56,9 @@
         .uk-flex.uk-flex-around.uk-margin-top.uk-margin-medium-bottom
           button#update-btn.uk-button.uk-button-large.uk-button-primary(@click='updateEpisodes') Update
           ModalSpinner(id='updateModal' title='Updating episodes list...')
-          button#download-btn.uk-button.uk-button-large.uk-button-secondary(@click='downloadEpisodes') Download
-          ModalSpinner(id='downloadModal' title='Downloading missing episodes...')
+          button#download-btn.uk-button.uk-button-large.uk-button-secondary(@click='downloadEpisodes()') Download All
+          ModalSpinner(id='downloadAllModal' title='Downloading missing episodes...')
+          ModalSpinner(id='downloadSingleModal' title='Downloading single episode...')
         .uk-panel
           h3.uk-panel-title Related Links
           ul.uk-list
@@ -115,6 +118,23 @@
       }
     },
     methods: {
+      episodeLabelClass: function(status) {
+        let type = '';
+        switch (status) {
+          case 'new':
+            break;
+          case 'downloaded':
+            type = 'success';
+            break;
+          case 'deleted':
+            type = 'danger';
+            break;
+          case 'unknown':
+            type = 'warning';
+            break;
+        }
+        return type ? `uk-label-${type}` : '';
+      },
       getFeedInfo: function() {
         this.$http.get(`util/feedinfo/${btoa(this.url)}`)
           .then((res) => {
@@ -159,12 +179,12 @@
           });
       },
       getFeedEpisodes: function() {
-        this.$http.get(`gpo/info/${btoa(this.url)}`)
+        this.$http.get(`gpo/episodes/${btoa(this.url)}`)
           .then((res) => {
             return res.json();
           })
           .then((jres) => {
-            this.enrichFeedEpisodes(jres.episodes, () => {
+            this.enrichFeedEpisodes(jres[this.url], () => {
               this.splitEpisodesInPages();
             });
           });
@@ -241,18 +261,18 @@
             this.getFeedEpisodes();
           });
       },
-      downloadEpisodes: function() {
-        let modal = this.$UIkit.modal(document.getElementById('downloadModal'));
+      downloadEpisodes: function(guid) {
+        let modal = this.$UIkit.modal(document.getElementById(`download${guid ? 'Single' : 'All'}Modal`));
         modal.show();
 
-        this.$http.get(`gpo/download/${btoa(this.url)}`)
+        this.$http.get(`gpo/download/${btoa(this.url)}${guid ? '/' + btoa(guid) : ''}`)
           .then((res) => {
             return res.json();
           })
           .then((jres) => {
             modal.hide();
             this.$UIkit.notification({
-              message: `${jres} episodes downloaded.`,
+              message: `${jres} episode${jres !== 0 && jres > 1 ? '' : 's'} downloaded.`,
               status: jres > 0 ? 'success' : 'primary',
               pos: 'top-center',
               timeout: 5000,
@@ -262,7 +282,7 @@
           .catch((err) => {
             modal.hide();
             this.$UIkit.notification({
-              message: `Error during episodes download!`,
+              message: `Error during episode${guid ? '' : 's'} download!`,
               status: 'danger',
               pos: 'top-center',
               timeout: 5000,

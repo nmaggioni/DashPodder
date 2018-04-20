@@ -6,6 +6,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 dashpodder*.tar.gz
+server/constants/bin/gpo
 
 # Editor directories and files
 .idea

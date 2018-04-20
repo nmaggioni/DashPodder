@@ -10,9 +10,17 @@
           td.uk-text-muted(v-text='i + 1 + indexOffset')
           td.uk-text-bold.uk-text-truncate(v-text='episode.title')
           td.uk-text-uppercase
-            span.uk-align-right.uk-text-uppercase.uk-label(
-              :class='episodeLabelClass(episode.status)'
-            ) {{ episode.status }}
+            .uk-flex.uk-preserve-width
+              div
+                span.uk-text-uppercase.uk-label(
+                  :class='episodeLabelClass(episode.status)'
+                ) {{ episode.status }}
+              div.download-icon
+                a(
+                  v-if='episode.status !== "downloaded"'
+                  uk-icon='icon: cloud-download'
+                  @click='$emit("downloadEpisode", episode.guid)'
+                )
 </template>
 
 <script>
@@ -55,10 +63,6 @@
   .index
     width 30px
 
-  //.trimmed-title
-  //  white-space nowrap
-  //  overflow hidden
-  //  text-overflow ellipsis
-  //  width 250px
-
+  .download-icon
+    margin-left 10px
 </style>

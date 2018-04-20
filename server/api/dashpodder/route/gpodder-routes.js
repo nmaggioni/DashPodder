@@ -43,7 +43,7 @@ module.exports = class GpodderRoutes {
       .get(GpodderController.update);
 
     router
-      .route("/api/gpo/download/:url?")
+      .route("/api/gpo/download/:url?/:guid?")
       .get(GpodderController.download);
 
     router

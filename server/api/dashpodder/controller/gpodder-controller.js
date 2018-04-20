@@ -103,8 +103,9 @@ module.exports = class GpodderController {
 
   static download(req, res) {
     let url = req.params.url ? decode(req.params.url) : null;
+    let guid = req.params.guid ? decode(req.params.guid) : null;
 
-    gpodder.download(url).then((numberOfDownloadedEpisodes) => {
+    gpodder.download(url, guid).then((numberOfDownloadedEpisodes) => {
       res.status(200).json(numberOfDownloadedEpisodes);
     }).catch(err => {
       res.status(500).json(err);

@@ -1,4 +1,5 @@
 const { run } = require('./child_process');
+const gpoPath = require('../config/gpo').useSystemScript ? 'gpo' : `${__dirname}/bin/gpo`;
 
 function splitAndClean(rawOutputString) {
   let lines = rawOutputString.split('\n');
@@ -25,20 +26,18 @@ function parseEpisodeStatus(statusChar) {
 }
 
 async function subscribe(url, name) {
-  console.log('gpo', ['subscribe', url, name].join(' '));
-  let gpo = await run('gpo', ['subscribe', url, name]);
+  let gpo = await run(gpoPath, ['subscribe', url, name]);
   let lines = splitAndClean(gpo.stdall);
   if (!lines.length || !lines[0].startsWith('Successfully added')) {
     let e = new Error(
       `gpo did not output a successful message: ${lines.length ? lines[0].replace('\n', '') : 'N/A'}`
     );
-    console.error(e);
     throw e;
   }
 }
 
 async function search(query) {
-  let gpo = await run('gpo', ['search', '"' + query + '"']);
+  let gpo = await run(gpoPath, ['search', '"' + query + '"']);
   let lines = splitAndClean(gpo.stdout);
   if (!lines.length) {
     return [];
@@ -51,7 +50,7 @@ async function search(query) {
 }
 
 async function toplist() {
-  let gpo = await run('gpo', ['toplist']);
+  let gpo = await run(gpoPath, ['toplist']);
   let lines = splitAndClean(gpo.stdout);
   if (!lines.length) {
     throw new Error("gpo did not output anything");
@@ -64,7 +63,7 @@ async function toplist() {
 }
 
 async function rename(url, newName) {
-  let gpo = await run('gpo', ['rename', url, newName]);
+  let gpo = await run(gpoPath, ['rename', url, newName]);
   let lines = splitAndClean(gpo.stdall);
   if (!lines.length) {
     throw new Error("gpo did not output anything");
@@ -72,7 +71,7 @@ async function rename(url, newName) {
 }
 
 async function unsubscribe(url) {
-  let gpo = await run('gpo', ['unsubscribe', url]);
+  let gpo = await run(gpoPath, ['unsubscribe', url]);
   let lines = splitAndClean(gpo.stdall);
   if (!lines.length) {
     throw new Error("gpo did not output anything");
@@ -80,7 +79,7 @@ async function unsubscribe(url) {
 }
 
 async function enable(url) {
-  let gpo = await run('gpo', ['enable', url]);
+  let gpo = await run(gpoPath, ['enable', url]);
   let lines = splitAndClean(gpo.stdall);
   if (!lines.length) {
     throw new Error("gpo did not output anything");
@@ -88,7 +87,7 @@ async function enable(url) {
 }
 
 async function disable(url) {
-  let gpo = await run('gpo', ['disable', url]);
+  let gpo = await run(gpoPath, ['disable', url]);
   let lines = splitAndClean(gpo.stdall);
   if (!lines.length) {
     throw new Error("gpo did not output anything");
@@ -96,7 +95,7 @@ async function disable(url) {
 }
 
 async function info(url, episodesLimit) {
-  let gpo = await run('gpo', ['info', url], true);
+  let gpo = await run(gpoPath, ['info', url], true);
   let rawLines = gpo.stdall;
   let lines = splitAndClean(gpo.stdall);
   if (!lines.length) {
@@ -121,13 +120,12 @@ async function info(url, episodesLimit) {
 }
 
 async function list() {
-  let gpo = await run('gpo', ['list']);
+  let gpo = await run(gpoPath, ['list']);
   let lines = splitAndClean(gpo.stdout);
   let linesNumber = lines.length;
   if (!linesNumber) {
     throw new Error("gpo did not output anything");
   } else if (linesNumber % 2 !== 0) {
-    console.log(lines);
     throw new Error("gpo did not output an even number of lines");
   }
   let feeds = {}, feedName;
@@ -142,7 +140,7 @@ async function list() {
 }
 
 async function update(url) {
-  let gpo = await run('gpo', ['update'].concat(url || []));
+  let gpo = await run(gpoPath, ['update'].concat(url || []));
   let lines = splitAndClean(gpo.stdall);
   if (!lines.length) {
     throw new Error("gpo did not output anything");
@@ -150,8 +148,8 @@ async function update(url) {
   return parseInt(lines[lines.length - 1].match(/^\d+/));
 }
 
-async function download(url) {
-  let gpo = await run('gpo', ['download'].concat(url || []));
+async function download(url, guid) {
+  let gpo = await run(gpoPath, ['download'].concat(url || []).concat(guid || []));
   let lines = splitAndClean(gpo.stdall);
   if (!lines.length) {
     throw new Error("gpo did not output anything");
@@ -160,7 +158,7 @@ async function download(url) {
 }
 
 async function pending(url) {
-  let gpo = await run('gpo', ['pending'].concat(url || []));
+  let gpo = await run(gpoPath, ['pending'].concat(url || []));
   let lines = splitAndClean(gpo.stdout);
   if (!lines.length) {
     throw new Error("gpo did not output anything");
@@ -181,7 +179,7 @@ async function pending(url) {
 
 async function episodes(url, limit, offset) {
   if (limit && offset) limit += offset;
-  let gpo = await run('gpo', ['episodes'].concat(url || []));
+  let gpo = await run(gpoPath, ['episodes', '--guid'].concat(url || []));
   let lines = splitAndClean(gpo.stdall);
   if (!lines.length) {
     throw new Error("gpo did not output anything");
@@ -193,12 +191,13 @@ async function episodes(url, limit, offset) {
       feedUrl = matchesUrl[1];
       episodesCount = 0;
     } else if (feedUrl) {
-      let matchesTitle = lines[i].match(/\d+\.\s+.\s+(.+)$/);
-      if (matchesTitle) {
+      let matches = lines[i].match(/\d+\.\s+(\S+)\s+(.)\s+(.+)$/);
+      if (matches) {
         if ((offset ? episodesCount >= offset : true) && (limit ? episodesCount < limit : true)) {
           let episode = {
-            title: matchesTitle[1],
-            status: parseEpisodeStatus(lines[i].match(/\d+\.\s+(.)\s+.+$/)[1])
+            title: matches[3],
+            guid: matches[1],
+            status: parseEpisodeStatus(matches[2]),
           };
           feeds[feedUrl] = feeds[feedUrl] ? feeds[feedUrl].concat(episode) : [episode];
         }
@@ -217,7 +216,7 @@ async function set(key, value) {
       optArray.push(value);
     }
   }
-  let gpo = await run('gpo', ['set'].concat(optArray));
+  let gpo = await run(gpoPath, ['set'].concat(optArray));
   let lines = splitAndClean(gpo.stdout);
   if (!lines.length || !lines[0].match(/.* = .*/)) {
     throw new Error(
@@ -233,7 +232,7 @@ async function set(key, value) {
 }
 
 async function rewrite(oldUrl, newUrl) {
-  let gpo = await run('gpo', ['rewrite', oldUrl, newUrl]);
+  let gpo = await run(gpoPath, ['rewrite', oldUrl, newUrl]);
   let lines = splitAndClean(gpo.stdall);
   if (!lines.length) {
     throw new Error("gpo did not output anything");
