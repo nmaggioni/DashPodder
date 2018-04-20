@@ -106,8 +106,10 @@
         tableOrList: 'table',
       };
     },
-    created: function() {
-      this.episodesPerPage = 10;
+    computed: {
+      episodesPerPage: function() {
+        return this.tableOrList === 'table' ? 10 : 5;
+      },
     },
     mounted: function() {
       let modal = this.$UIkit.modal(document.getElementById('loadingModal'));
@@ -323,10 +325,8 @@
         let oldPageNumber = this.currentPage;
         if (this.tableOrList === 'table') {
           this.tableOrList = 'list';
-          this.episodesPerPage /= 3;
         } else {
           this.tableOrList = 'table';
-          this.episodesPerPage *= 3;
         }
         this.splitEpisodesInPages();
         if (oldPageNumber > this.pagedEpisodes.length - 2) {
