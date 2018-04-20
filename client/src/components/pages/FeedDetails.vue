@@ -168,6 +168,8 @@
 
                   if (callback) callback();
                 });
+            } else {
+              if (callback) callback();
             }
 
             this.$http.get(`util/feedinfoscrape/${btoa(this.mygpoUrl)}`)
