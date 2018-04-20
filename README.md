@@ -2,6 +2,14 @@
 
 A simple WebUI for GPodder to manage your subscriptions and downloaded episodes.
 
+## Screenshots
+
+> Ain't nobody got time for projects without screenshots.
+
+![Your Subscriptions](https://raw.githubusercontent.com/nmaggioni/DashPodder/master/_docs/subscriptions.png)
+![Feed Details - list view](https://raw.githubusercontent.com/nmaggioni/DashPodder/master/_docs/feedinfo_list.png)
+![Feed Details - table view](https://raw.githubusercontent.com/nmaggioni/DashPodder/master/_docs/feedinfo_table.png)
+
 ## Requirements
 
 + GPodder must be installed and its binary `gpo` must be in _$PATH_.
