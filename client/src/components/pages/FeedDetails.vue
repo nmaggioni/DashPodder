@@ -31,10 +31,12 @@
           EpisodesTable.uk-margin-small-top(v-if='tableOrList === "table"'
             :episodes='pagedEpisodes[currentPage]'
             :indexOffset='episodesPerPage * currentPage'
+            :episodeLabelClassFn='episodeLabelClass'
             @downloadEpisode='downloadEpisodes'
           )
           EpisodesList.uk-margin-medium-top(v-else
             :episodes='pagedEpisodes[currentPage]'
+            :episodeLabelClassFn='episodeLabelClass'
             @downloadEpisode='downloadEpisodes'
           )
           Pagination.uk-margin-large-top(

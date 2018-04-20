@@ -9,7 +9,7 @@
           @click='$emit("downloadEpisode", episode.guid)'
         )
         span.uk-align-right.uk-text-uppercase.uk-label(
-          :class='episodeLabelClass(episode.status)'
+          :class='episodeLabelClassFn(episode.status)'
         )
           | {{ episode.status }}
       dd(v-if='episode.extras') {{ episode.extras.summary }}
@@ -24,24 +24,9 @@
         type: Array,
         required: true,
       },
-    },
-    methods: {
-      episodeLabelClass: function(status) {
-        let type = '';
-        switch (status) {
-          case 'new':
-            break;
-          case 'downloaded':
-            type = 'success';
-            break;
-          case 'deleted':
-            type = 'danger';
-            break;
-          case 'unknown':
-            type = 'warning';
-            break;
-        }
-        return type ? `uk-label-${type}` : '';
+      episodeLabelClassFn: {
+        type: Function,
+        required: true,
       },
     },
   };
