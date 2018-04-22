@@ -209,10 +209,11 @@ module.exports = class UtilityController {
           episodeInfos.push({
             title: episode.title,
             subtitle: episode.itunes.subtitle,
+            guid: episode.guid,
             creator: episode.creator,
             date: episode.isoDate,
             link: episode.link,
-            media: episode.enclosure.url,
+            media: episode.enclosure ? episode.enclosure.url : '',
             content: episode.contentSnippet,
             summary: episode.itunes.summary,
             duration: episode.itunes.duration,

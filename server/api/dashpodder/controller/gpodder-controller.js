@@ -45,7 +45,7 @@ module.exports = class GpodderController {
   static unsubscribe(req, res) {
     let url = decode(req.params.url);
 
-    gpodder.subscribe(url).then(() => {
+    gpodder.unsubscribe(url).then(() => {
       res.status(200).json({});
     }).catch(err => {
       res.status(500).json(err);

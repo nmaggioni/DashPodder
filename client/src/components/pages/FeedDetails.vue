@@ -6,8 +6,11 @@
         article.uk-article
           .uk-flex.uk-flex-left.uk-flex-middle
             h1.uk-article-title(v-text='title')
-            span(uk-icon='pencil' @click='renameFeedStart' v-if='title').uk-margin-left
-          ModalFeedRename(id='renameModal' v-if='localTitle'
+            span(uk-icon='pencil' @click='renameFeedStart' v-if='title && subscribed').uk-margin-left
+            template(v-if='subscribed')
+              span(uk-icon='trash' @click='unsubscribe').uk-margin-left
+              ModalSpinner(id='unsubscribeModal' title='Unsubscribing from feed...')
+          ModalFeedRename(id='renameModal' v-if='localTitle && subscribed'
             :feedUrl='url'
             :feedTitle='localTitle'
             @renameDone='renameFeedDone'
@@ -33,11 +36,13 @@
             :episodes='pagedEpisodes[currentPage]'
             :indexOffset='episodesPerPage * currentPage'
             :episodeLabelClassFn='episodeLabelClass'
+            :subscribed='subscribed'
             @downloadEpisode='downloadEpisodes'
           )
           EpisodesList.uk-margin-medium-top(v-else
             :episodes='pagedEpisodes[currentPage]'
             :episodeLabelClassFn='episodeLabelClass'
+            :subscribed='subscribed'
             @downloadEpisode='downloadEpisodes'
           )
           Pagination.uk-margin-large-top(
@@ -57,11 +62,15 @@
               | {{ tag }}
               span.span-br(v-if='i !== tags.length - 1') ,&nbsp;
         .uk-flex.uk-flex-around.uk-margin-top.uk-margin-medium-bottom
-          button#update-btn.uk-button.uk-button-large.uk-button-primary(@click='updateEpisodes') Update
-          ModalSpinner(id='updateModal' title='Updating episodes list...')
-          button#download-btn.uk-button.uk-button-large.uk-button-secondary(@click='downloadEpisodes()') Download All
-          ModalSpinner(id='downloadAllModal' title='Downloading missing episodes...')
-          ModalSpinner(id='downloadSingleModal' title='Downloading single episode...')
+          template(v-if='subscribed')
+            button.uk-button.uk-button-large.uk-button-primary(@click='updateEpisodes') Update
+            ModalSpinner(id='updateModal' title='Updating episodes list...')
+            button.uk-button.uk-button-large.uk-button-secondary(@click='downloadEpisodes()') Download All
+            ModalSpinner(id='downloadAllModal' title='Downloading missing episodes...')
+            ModalSpinner(id='downloadSingleModal' title='Downloading single episode...')
+          template(v-else)
+            button.uk-button.uk-button-large.uk-button-success(@click='subscribe') Subscribe
+            ModalSpinner(id='subscribeModal' title='Subscribing to feed...')
         .uk-panel
           h3.uk-panel-title Related Links
           ul.uk-list
@@ -93,6 +102,7 @@
       return {
         url: '',
         localTitle: '',
+        subscribed: false,
         title: 'Unknown',
         publisher: 'Unknown',
         description: 'Loading...',
@@ -120,10 +130,12 @@
       this.url = this.$route.query.url;
       this.localTitle = this.$route.query.title;
       if (this.url.length > 0) {
-        this.getFeedInfo((function(modal) {
-          modal.hide();
-        }).bind(null, modal));
-        this.getFeedEpisodes();
+        this.isSubscribed(this.url, () => {
+          this.getFeedInfo(function() {
+            modal.hide();
+          });
+          this.getFeedEpisodes();
+        });
       }
     },
     methods: {
@@ -143,6 +155,23 @@
             break;
         }
         return type ? `uk-label-${type}` : '';
+      },
+      isSubscribed: function(url, callback) {
+        this.$http.get('gpo/list')
+          .then((feeds) => {
+            return feeds.json();
+          })
+          .then((feeds) => {
+            for (let feed in feeds) {
+              if (feeds.hasOwnProperty(feed)) {
+                if (feeds[feed] === url) {
+                  this.subscribed = true;
+                  break;
+                }
+              }
+            }
+            if (callback) callback();
+          });
       },
       getFeedInfo: function(callback) {
         this.$http.get(`util/feedinfo/${btoa(this.url)}`)
@@ -192,31 +221,49 @@
           });
       },
       getFeedEpisodes: function() {
-        this.$http.get(`gpo/episodes/${btoa(this.url)}`)
-          .then((res) => {
-            return res.json();
-          })
-          .then((jres) => {
-            this.enrichFeedEpisodes(jres[this.url], () => {
-              this.splitEpisodesInPages();
-            });
-          });
-      },
-      enrichFeedEpisodes: function(episodes, callback) {
-        this.$http.get(`util/episodesinfoscrape/${btoa(this.url)}/${episodes.length}`)
-          .then((res) => {
-            return res.json();
-          })
-          .then((jres) => {
-            jres.forEach((episodeInfo) => {
-              episodes.some((episode) => {
-                if (!episode.extras) {
-                  if (episode.title.toLowerCase() === episodeInfo.title.toLowerCase()) {
-                    episode.extras = episodeInfo;
-                  }
-                }
+        if (this.subscribed) {
+          this.$http.get(`gpo/episodes/${btoa(this.url)}`)
+            .then((res) => {
+              return res.json();
+            })
+            .then((jres) => {
+              this.enrichFeedEpisodes(jres[this.url], () => {
+                this.splitEpisodesInPages();
               });
             });
+        } else {
+          this.enrichFeedEpisodes(null, () => {
+            this.splitEpisodesInPages();
+          });
+        }
+      },
+      enrichFeedEpisodes: function(episodes, callback) {
+        this.$http.get(`util/episodesinfoscrape/${btoa(this.url)}` + (episodes ? `/${episodes.length}` : ''))
+          .then((res) => {
+            return res.json();
+          })
+          .then((jres) => {
+            if (episodes) {
+              jres.forEach((episodeInfo) => {
+                episodes.some((episode) => {
+                  if (!episode.extras) {
+                    if (episode.title.toLowerCase() === episodeInfo.title.toLowerCase()) {
+                      episode.extras = episodeInfo;
+                    }
+                  }
+                });
+              });
+              } else {
+                episodes = [];
+                jres.forEach((episodeInfo) => {
+                  episodes.push({
+                    guid: '',
+                    status: 'new',
+                    title: episodeInfo.title,
+                    extras: episodeInfo,
+                  });
+                });
+              }
             this.episodes = episodes;
             callback();
           });
@@ -303,6 +350,71 @@
             this.getFeedEpisodes();
           });
       },
+      subscribe: function() {
+        let modal = this.$UIkit.modal(document.getElementById(`subscribeModal`));
+        modal.show();
+
+        this.$http.get(`gpo/subscribe/${btoa(this.url)}/${btoa(this.title)}`)
+          .then((res) => {
+            return res.json();
+          })
+          .then((jres) => {
+            modal.hide();
+            this.$UIkit.notification({
+              message: `Successfully subscribed.`,
+              status: 'success',
+              pos: 'top-center',
+              timeout: 5000,
+            });
+            this.isSubscribed(this.url, () => {
+              this.getFeedEpisodes();
+            });
+          })
+          .catch((err) => {
+            modal.hide();
+            this.$UIkit.notification({
+              message: `Could not subscribe.`,
+              status: 'danger',
+              pos: 'top-center',
+              timeout: 5000,
+            });
+          });
+      },
+      unsubscribe: function() {
+        this.$UIkit.modal.confirm('Do you really want to unsubscribe from this feed?').then(() => {
+          let modal = this.$UIkit.modal(document.getElementById(`unsubscribeModal`));
+          modal.show();
+
+          this.$http.get(`gpo/unsubscribe/${btoa(this.url)}`)
+            .then(() => {
+              modal.hide();
+              this.$UIkit.notification({
+                message: `Successfully unsubscribed.`,
+                status: 'success',
+                pos: 'top-center',
+                timeout: 5000,
+              });
+              this.subscribed = false;
+              this.getFeedEpisodes();
+            })
+            .catch((err) => {
+              modal.hide();
+              this.$UIkit.notification({
+                message: `Could not unsubscribe.`,
+                status: 'danger',
+                pos: 'top-center',
+                timeout: 5000,
+              });
+            });
+        }, () => {
+            this.$UIkit.notification({
+              message: `Did not do anything.`,
+              status: 'warning',
+              pos: 'top-center',
+              timeout: 5000,
+            });
+        });
+      },
       splitEpisodesInPages: function() {
         let episodesPerPage = Math.floor(this.episodesPerPage);
         this.pagedEpisodes = [];
@@ -331,7 +443,7 @@
           this.tableOrList = 'table';
         }
         this.splitEpisodesInPages();
-        if (oldPageNumber > this.pagedEpisodes.length - 2) {
+        if (oldPageNumber > 0 && oldPageNumber > this.pagedEpisodes.length - 2) {
           this.currentPage = this.pagedEpisodes.length - 2;
         }
         localStorage.setItem('episodesViewType', this.tableOrList);

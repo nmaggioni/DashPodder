@@ -4,7 +4,7 @@
       dt.uk-text-primary(:key='i')
         span {{ episode.title }}
         a.uk-align-right(
-          v-if='episode.status !== "downloaded"'
+          v-if='subscribed && episode.status !== "downloaded"'
           uk-icon='icon: cloud-download'
           @click='$emit("downloadEpisode", episode.guid)'
         )
@@ -26,6 +26,10 @@
       },
       episodeLabelClassFn: {
         type: Function,
+        required: true,
+      },
+      subscribed: {
+        type: Boolean,
         required: true,
       },
     },
