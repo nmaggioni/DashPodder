@@ -1,11 +1,11 @@
 const PORT = process.env.PORT || 3333;
 
-const fs = require("fs");
-const os = require("os");
-const http = require("http");
-const express = require("express");
-const RoutesConfig = require("./config/routes.conf");
-const Routes = require("./routes/index");
+const fs = require('fs');
+const os = require('os');
+const http = require('http');
+const express = require('express');
+const RoutesConfig = require('./config/routes.conf');
+const Routes = require('./routes/index');
 
 const { useSystemScript } = require('./config/gpo');
 if (!useSystemScript && !fs.existsSync('./constants/bin/gpo')) {

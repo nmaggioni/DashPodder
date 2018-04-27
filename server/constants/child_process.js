@@ -2,7 +2,9 @@ const { spawn } = require('child_process');
 
 async function run(command, args, discardPager) {
   return new Promise((resolve, reject) => {
-    let stdall = "", stdout = "", stderr = "";
+    let stdall = '';
+    let stdout = '';
+    let stderr = '';
     let env = process.env;
     if (discardPager) {
       env.TERM = 'dumb';
@@ -28,16 +30,16 @@ async function run(command, args, discardPager) {
         code: code,
         stdall: stdall,
         stdout: stdout,
-        stderr: stderr
+        stderr: stderr,
       });
     });
 
     cmd.on('error', (err) => {
-      throw new Error(`Unable to spawn child process: ${err}`);
+      reject(new Error(`Unable to spawn child process: ${err}`));
     });
   });
 }
 
 module.exports = {
-  run: run
+  run: run,
 };
