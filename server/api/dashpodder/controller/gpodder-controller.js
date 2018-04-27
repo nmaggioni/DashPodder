@@ -1,14 +1,14 @@
-const gpodder = require("../../../constants/gpodder");
-const { decode } = require("../../../constants/base64");
+const gpodder = require('../../../constants/gpodder');
+const { decode } = require('../../../constants/base64');
 
 module.exports = class GpodderController {
   static subscribe(req, res) {
-    let url = decode(req.params.url),
-      name = decode(req.params.name);
+    let url = decode(req.params.url);
+    let name = decode(req.params.name);
 
     gpodder.subscribe(url, name).then(() => {
       res.status(200).json({});
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
@@ -16,28 +16,28 @@ module.exports = class GpodderController {
   static search(req, res) {
     let query = decode(req.params.query);
 
-    gpodder.search(query).then(results => {
+    gpodder.search(query).then((results) => {
       res.status(results.length ? 200 : 204).json(results);
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
 
   static toplist(req, res) {
-    gpodder.toplist().then(results => {
+    gpodder.toplist().then((results) => {
       res.status(200).json(results);
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
 
   static rename(req, res) {
-    let url = decode(req.params.url),
-      newname = decode(req.params.newname);
+    let url = decode(req.params.url);
+    let newname = decode(req.params.newname);
 
     gpodder.rename(url, newname).then(() => {
       res.status(200).json({});
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
@@ -47,7 +47,7 @@ module.exports = class GpodderController {
 
     gpodder.unsubscribe(url).then(() => {
       res.status(200).json({});
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
@@ -57,7 +57,7 @@ module.exports = class GpodderController {
 
     gpodder.enable(url).then(() => {
       res.status(200).json({});
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
@@ -67,18 +67,18 @@ module.exports = class GpodderController {
 
     gpodder.disable(url).then(() => {
       res.status(200).json({});
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
 
   static info(req, res) {
-    let url = decode(req.params.url),
-      limit = req.params.limit ? parseInt(req.params.limit) : null;
+    let url = decode(req.params.url);
+    let limit = req.params.limit ? parseInt(req.params.limit) : null;
 
     gpodder.info(url, limit).then((info) => {
       res.status(200).json(info);
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
@@ -86,7 +86,7 @@ module.exports = class GpodderController {
   static list(req, res) {
     gpodder.list().then((list) => {
       res.status(200).json(list);
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
@@ -96,7 +96,7 @@ module.exports = class GpodderController {
 
     gpodder.update(url).then((numberOfNewEpisodes) => {
       res.status(200).json(numberOfNewEpisodes);
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
@@ -107,7 +107,7 @@ module.exports = class GpodderController {
 
     gpodder.download(url, guid).then((numberOfDownloadedEpisodes) => {
       res.status(200).json(numberOfDownloadedEpisodes);
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
@@ -117,41 +117,41 @@ module.exports = class GpodderController {
 
     gpodder.pending(url).then((result) => {
       res.status(200).json(result);
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
 
   static episodes(req, res) {
-    let url = req.params.url ? decode(req.params.url) : null,
-      limit = req.params.limit ? parseInt(req.params.limit) : null,
-      offset = req.params.offset ? parseInt(req.params.offset) : null;
+    let url = req.params.url ? decode(req.params.url) : null;
+    let limit = req.params.limit ? parseInt(req.params.limit) : null;
+    let offset = req.params.offset ? parseInt(req.params.offset) : null;
 
     gpodder.episodes(url, limit, offset).then((result) => {
       res.status(200).json(result);
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
 
   static set(req, res) {
-    let key = req.params.key ? decode(req.params.key) : null,
-      value = req.params.value ? decode(req.params.value) : null;
+    let key = req.params.key ? decode(req.params.key) : null;
+    let value = req.params.value ? decode(req.params.value) : null;
 
     gpodder.set(key, value).then((result) => {
       res.status(200).json(result);
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }
 
   static rewrite(req, res) {
-    let oldurl = decode(req.params.oldurl),
-      newurl = decode(req.params.newurl);
+    let oldurl = decode(req.params.oldurl);
+    let newurl = decode(req.params.newurl);
 
     gpodder.rewrite(oldurl, newurl).then(() => {
       res.status(200).json({});
-    }).catch(err => {
+    }).catch((err) => {
       res.status(500).json(err);
     });
   }

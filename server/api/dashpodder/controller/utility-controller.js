@@ -5,12 +5,9 @@ const Parser = require('rss-parser');
 const { JSDOM } = require('jsdom');
 const { decode } = require('../../../constants/base64');
 
-/*
 function chooseProtocol(url) {
-
   return url.startsWith('https') ? https : http;
 }
-*/
 
 module.exports = class UtilityController {
   static toplist(req, res) {
@@ -99,7 +96,7 @@ module.exports = class UtilityController {
   static feedinfoscrape(req, res) {
     let mygpourl = decode(req.params.mygpourl);
 
-    https.get(mygpourl.replace(/^http:/, 'https:'), (gpodderRes) => {
+    chooseProtocol(mygpourl).get(mygpourl.replace(/^http:/, 'https:'), (gpodderRes) => {
       let body = '';
 
       gpodderRes
@@ -190,8 +187,8 @@ module.exports = class UtilityController {
 
   static episodesinfoscrape(req, res) {
     let podcastUrl = decode(req.params.podcasturl);
-    let limit = Math.abs(parseInt(req.params.limit || 0));
-    let offset = Math.abs(parseInt(req.params.offset || 0));
+    let limit = Math.abs(parseInt(req.params.limit) || 0);
+    let offset = Math.abs(parseInt(req.params.offset) || 0);
 
     let parser = new Parser({
       headers: { 'Accept': 'application/rss+xml,application/rss,application/xml' },
