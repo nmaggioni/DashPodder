@@ -24,14 +24,14 @@
         th.uk-table-shrink Key
         th.uk-table-expand Value
         th.uk-table-shrink Edit
-      tr(v-for='(value, key) in settings' :key='key'
-      :class='{ "uk-text-bold": modifiedSettings.hasOwnProperty(key) }'
+      tr(v-for='setting in sortedSettings' :key='setting.key'
+      :class='{ "uk-text-bold": modifiedSettings.hasOwnProperty(setting.key) }'
       )
-        td(v-text='key')
-        td(v-if='modifiedSettings[key]') {{ modifiedSettings[key] }}
-        td(v-else) {{ value }}
+        td(v-text='setting.key')
+        td(v-if='modifiedSettings[setting.key]') {{ modifiedSettings[setting.key] }}
+        td(v-else) {{ setting.value }}
         td
-          span(uk-icon='icon: pencil' @click='editSetting(key)').edit-icon
+          span(uk-icon='icon: pencil' @click='editSetting(setting.key)').edit-icon
 </template>
 
 <script>
@@ -51,6 +51,22 @@
         editingKey: '',
         editingValue: '',
       };
+    },
+    computed: {
+      sortedSettings: function() {
+        let sortedSettings = [];
+        for (let setting in this.settings) {
+          if (this.settings.hasOwnProperty(setting)) {
+            sortedSettings.push({ key: setting, value: this.settings[setting] });
+          }
+        }
+        sortedSettings.sort(function(a, b) {
+          if (a.key < b.key) return -1;
+          if (a.key > b.key) return 1;
+          return 0;
+        });
+        return sortedSettings;
+      },
     },
     mounted: function() {
       this.getSettings();
