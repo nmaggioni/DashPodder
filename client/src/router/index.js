@@ -4,6 +4,7 @@ import PageSubscriptions from '@pages/Subscriptions';
 import PageTopFeeds from '@pages/TopFeeds';
 import PageSearch from '@pages/Search';
 import PageFeedDetails from '@pages/FeedDetails';
+import PageSettings from '@pages/Settings';
 
 Vue.use(Router);
 
@@ -29,6 +30,11 @@ export default new Router({
       path: '/feed',
       name: 'Feed',
       component: PageFeedDetails,
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: PageSettings,
     },
   ],
 });

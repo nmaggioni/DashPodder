@@ -59,6 +59,10 @@ module.exports = class GpodderRoutes {
       .get(GpodderController.set);
 
     router
+      .route('/api/gpo/setall')
+      .post(GpodderController.setAll);
+
+    router
       .route('/api/gpo/rewrite/:oldurl/:newurl')
       .get(GpodderController.rewrite);
   }

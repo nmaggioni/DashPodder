@@ -145,6 +145,26 @@ module.exports = class GpodderController {
     });
   }
 
+  static setAll(req, res) {
+    let settings = req.body;
+    if (!Object.keys(settings).length) {
+      res.status(204).end();
+    }
+    let requests = [];
+
+    for (let key in settings) {
+      if (settings.hasOwnProperty(key)) {
+        requests.push(gpodder.set(key, settings[key]));
+      }
+    }
+
+    Promise.all(requests).then(() => {
+      res.status(200).end();
+    }, (err) => {
+      res.status(500).json(err);
+    });
+  }
+
   static rewrite(req, res) {
     let oldurl = decode(req.params.oldurl);
     let newurl = decode(req.params.newurl);
