@@ -112,6 +112,17 @@ module.exports = class GpodderController {
     });
   }
 
+  static _delete(req, res) {
+    let url = req.params.url ? decode(req.params.url) : null;
+    let guid = req.params.guid ? decode(req.params.guid) : null;
+
+    gpodder._delete(url, guid).then(() => {
+      res.status(200).json();
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  }
+
   static pending(req, res) {
     let url = req.params.url ? decode(req.params.url) : null;
 

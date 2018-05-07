@@ -38,12 +38,14 @@
             :episodeLabelClassFn='episodeLabelClass'
             :subscribed='subscribed'
             @downloadEpisode='downloadEpisodes'
+            @deleteEpisode='deleteEpisodes'
           )
           EpisodesList.uk-margin-medium-top(v-else
             :episodes='pagedEpisodes[currentPage]'
             :episodeLabelClassFn='episodeLabelClass'
             :subscribed='subscribed'
             @downloadEpisode='downloadEpisodes'
+            @deleteEpisode='deleteEpisodes'
           )
           Pagination.uk-margin-large-top(
             :pages='pagedEpisodes.length - 1'
@@ -68,6 +70,7 @@
             button.uk-button.uk-button-large.uk-button-secondary(@click='downloadEpisodes()') Download All
             ModalSpinner(id='downloadAllModal' title='Downloading missing episodes...')
             ModalSpinner(id='downloadSingleModal' title='Downloading single episode...')
+            ModalSpinner(id='deleteModal' title='Deleting episode...')
           template(v-else)
             button.uk-button.uk-button-large.uk-button-success(@click='subscribe') Subscribe
             ModalSpinner(id='subscribeModal' title='Subscribing to feed...')
@@ -343,6 +346,32 @@
             modal.hide();
             this.$UIkit.notification({
               message: `Error during episode${guid ? '' : 's'} download!`,
+              status: 'danger',
+              pos: 'top-center',
+              timeout: 5000,
+            });
+            this.getFeedEpisodes();
+          });
+      },
+      deleteEpisodes: function(guid) {
+        let modal = this.$UIkit.modal(document.getElementById('deleteModal'));
+        modal.show();
+
+        this.$http.get(`gpo/delete/${btoa(this.url)}/${btoa(guid)}`)
+          .then(() => {
+            modal.hide();
+            this.$UIkit.notification({
+              message: `Episode deleted.`,
+              status: 'success',
+              pos: 'top-center',
+              timeout: 5000,
+            });
+            this.getFeedEpisodes();
+          })
+          .catch((err) => {
+            modal.hide();
+            this.$UIkit.notification({
+              message: `Error during episode deletion!`,
               status: 'danger',
               pos: 'top-center',
               timeout: 5000,

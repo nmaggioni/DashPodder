@@ -15,11 +15,17 @@
                 span.uk-text-uppercase.uk-label(
                   :class='episodeLabelClassFn(episode.status)'
                 ) {{ episode.status }}
-              div.download-icon
+              div.episode-action-icon
                 a(
                   v-if='subscribed && episode.status !== "downloaded"'
-                  uk-icon='icon: cloud-download'
+                  uk-icon='cloud-download'
                   @click='$emit("downloadEpisode", episode.guid)'
+                )
+              div.episode-action-icon
+                a(
+                  v-if='subscribed && episode.status === "downloaded"'
+                  uk-icon='trash'
+                  @click='$emit("deleteEpisode", episode.guid)'
                 )
 </template>
 
@@ -52,6 +58,6 @@
   .index
     width 30px
 
-  .download-icon
+  .episode-action-icon
     margin-left 10px
 </style>

@@ -155,6 +155,14 @@ async function download(url, guid) {
   return parseInt(lines[lines.length - 1].match(/^\d+/));
 }
 
+async function _delete(url, guid) {
+  let gpo = await run(gpoPath, ['delete'].concat([url, guid]));
+  let lines = splitAndClean(gpo.stdall);
+  if (!lines.length) {
+    throw new Error('gpo did not output anything');
+  }
+}
+
 async function pending(url) {
   let gpo = await run(gpoPath, ['pending'].concat(url || []));
   let lines = splitAndClean(gpo.stdout);
@@ -252,6 +260,7 @@ module.exports = {
   list: list,
   update: update,
   download: download,
+  _delete: _delete,
   pending: pending,
   episodes: episodes,
   set: set,

@@ -47,6 +47,10 @@ module.exports = class GpodderRoutes {
       .get(GpodderController.download);
 
     router
+      .route('/api/gpo/delete/:url/:guid')
+      .get(GpodderController._delete);
+
+    router
       .route('/api/gpo/pending/:url?')
       .get(GpodderController.pending);
 
