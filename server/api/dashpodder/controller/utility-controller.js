@@ -96,7 +96,7 @@ module.exports = class UtilityController {
   static feedinfoscrape(req, res) {
     let mygpourl = decode(req.params.mygpourl);
 
-    chooseProtocol(mygpourl).get(mygpourl.replace(/^http:/, 'https:'), (gpodderRes) => {
+    chooseProtocol(mygpourl).get(mygpourl, (gpodderRes) => {
       let body = '';
 
       gpodderRes
