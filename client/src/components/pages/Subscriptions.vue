@@ -1,19 +1,27 @@
 <template lang="pug">
   .main
-    SubscriptionsList
+    SubscriptionsList.uk-margin-large-bottom(ref='subscriptionList')
+    SubscriptionNew.uk-align-center(@refresh='newSubscribe')
 </template>
 
 <script>
   import SubscriptionsList from '@components/SubscriptionsList';
+  import SubscriptionNew from '@components/SubscriptionNew';
 
   export default {
     name: 'Subscriptions',
     components: {
       SubscriptionsList,
+      SubscriptionNew,
     },
     data: function() {
       return {
       };
+    },
+    methods: {
+      newSubscribe: function() {
+        this.$refs.subscriptionList.getAll();
+      },
     },
   };
 </script>

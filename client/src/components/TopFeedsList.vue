@@ -1,5 +1,5 @@
 <template lang="pug">
-  .uk-card.uk-card-default.uk-card-body
+  div
     .heading-with-spinner
       h1.uk-text-center Top feeds
       div(uk-spinner="ratio: 1" v-if="loadingOrParsing")

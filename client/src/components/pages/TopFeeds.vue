@@ -1,6 +1,5 @@
 <template lang="pug">
-  .main
-    TopFeedsList
+  TopFeedsList
 </template>
 
 <script>

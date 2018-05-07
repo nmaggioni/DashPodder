@@ -13,7 +13,7 @@
 
   #app
     .uk-container.uk-container-center.uk-margin-top.uk-margin-large-bottom
-      nav.uk-navbar.uk-margin-large-bottom
+      nav.uk-navbar.uk-margin-bottom
         a.uk-navbar-brand.uk-hidden-small(href="/") DashPodder
         .uk-navbar-left
           ul.uk-navbar-nav.uk-hidden-small
@@ -24,7 +24,8 @@
         a.uk-navbar-toggle.uk-visible-small(uk-toggle="target: #offcanvas-nav")
         .uk-navbar-brand.uk-navbar-center.uk-visible-small DashPodder
 
-      router-view
+      .uk-card.uk-card-default.uk-card-body
+        router-view
 
     #offcanvas-nav(uk-offcanvas='overlay: true')
       .uk-offcanvas-bar

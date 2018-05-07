@@ -1,5 +1,5 @@
 <template lang="pug">
-  .uk-card.uk-card-default.uk-card-body
+  div
     h1.uk-text-center Search for a feed
     form.uk-form-horizontal.uk-grid-small.uk-text-center(uk-grid @submit.prevent='search')
       .uk-width-1-2.uk-container-center

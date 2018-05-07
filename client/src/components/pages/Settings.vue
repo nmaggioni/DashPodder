@@ -1,5 +1,5 @@
 <template lang="pug">
-  .main
+  div
     ModalSpinner(id='loadingModal' title='Loading settings...')
     ModalSpinner(id='savingModal' title='Saving settings...')
     ModalEditSetting(:id='"editingModal"'

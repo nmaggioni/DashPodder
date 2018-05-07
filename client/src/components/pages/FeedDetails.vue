@@ -1,5 +1,5 @@
 <template lang="pug">
-  .main
+  div
     ModalSpinner(id='loadingModal' title='Getting feed details...')
     .uk-grid(data-uk-grid-margin='')
       .uk-width-medium-3-4.uk-row-first

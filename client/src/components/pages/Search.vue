@@ -1,6 +1,5 @@
 <template lang="pug">
-  .main
-    SearchFeeds
+  SearchFeeds
 </template>
 
 <script>
