@@ -15,19 +15,23 @@
     .uk-container.uk-container-center.uk-margin-top.uk-margin-large-bottom
       nav.uk-navbar.uk-margin-large-bottom
         a.uk-navbar-brand.uk-hidden-small(href="/") DashPodder
-        ul.uk-navbar-nav.uk-hidden-small
-          +navbar_items_left
-        ul.uk-navbar-nav.uk-hidden-small.uk-position-right
-          +navbar_items_right
-        //a.uk-navbar-toggle.uk-visible-small(href="#offcanvas" data-uk-offcanvas="")
+        .uk-navbar-left
+          ul.uk-navbar-nav.uk-hidden-small
+            +navbar_items_left
+        .uk-navbar-right
+          ul.uk-navbar-nav.uk-hidden-small
+            +navbar_items_right
+        a.uk-navbar-toggle.uk-visible-small(uk-toggle="target: #offcanvas-nav")
         .uk-navbar-brand.uk-navbar-center.uk-visible-small DashPodder
 
       router-view
 
-    //#offcanvas.uk-offcanvas
+    #offcanvas-nav(uk-offcanvas='overlay: true')
       .uk-offcanvas-bar
-        ul.uk-nav.uk-nav-offcanvas
+        ul.uk-nav.uk-nav-default
           +navbar_items_left
+          li.uk-nav-divider
+          +navbar_items_right
 </template>
 
 <script>
