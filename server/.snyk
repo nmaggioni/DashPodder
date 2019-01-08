@@ -13,10 +13,10 @@ patch:
     - nodemon > chokidar > fsevents > node-pre-gyp > hawk > cryptiles > boom > hoek:
         patched: '2018-12-04T00:10:53.312Z'
     - nodemon > chokidar > fsevents > node-pre-gyp > hawk > hoek:
-        patched: '2019-01-08T18:47:17.813Z'
+        patched: '2019-01-08T18:50:46.455Z'
     - nodemon > chokidar > fsevents > node-pre-gyp > hawk > boom > hoek:
-        patched: '2019-01-08T18:47:17.813Z'
+        patched: '2019-01-08T18:50:46.455Z'
     - nodemon > chokidar > fsevents > node-pre-gyp > hawk > sntp > hoek:
-        patched: '2019-01-08T18:47:17.813Z'
+        patched: '2019-01-08T18:50:46.455Z'
     - nodemon > chokidar > fsevents > node-pre-gyp > hawk > cryptiles > boom > hoek:
-        patched: '2019-01-08T18:47:17.813Z'
+        patched: '2019-01-08T18:50:46.455Z'
