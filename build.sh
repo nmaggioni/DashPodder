@@ -4,21 +4,23 @@ echo -e "### Setting up environment..."
 
 set -e
 
+# shellcheck disable=SC2034
 NODE_ENV=production
 
 PACKAGE_MANAGER="yarn"
-which yarn &>/dev/null
-IS_YARN_INSTALLED="$?"
-if [[ $IS_YARN_INSTALLED != 0 ]]; then
+set +e
+if ! command -v yarn &>/dev/null; then
   PACKAGE_MANAGER="npm"
 fi
+set -e
 
 echo -e "### Building frontend...\n"
 
-cd client
-$PACKAGE_MANAGER install
-$PACKAGE_MANAGER run build
-cd ..
+(
+    cd client
+    $PACKAGE_MANAGER install
+    $PACKAGE_MANAGER run build
+)
 
 echo -e "\n### Cleaning backend...\n"
 
@@ -28,9 +30,10 @@ fi
 
 echo -e "\n### Building backend...\n"
 
-cd server
-$PACKAGE_MANAGER install --production
-cd ..
+(
+    cd server
+    $PACKAGE_MANAGER install --production
+)
 
 echo -e "\n### Parsing repo status..."
 
@@ -43,8 +46,7 @@ if [[ $GIT_REF == "" ]]; then
   GIT_REF="$GIT_COMMIT"
 fi
 GIT_DIRTY=""
-git diff-index --quiet HEAD
-if [[ "$?" != "0" ]]; then
+if ! git diff-index --quiet HEAD; then
   GIT_DIRTY="_dirty"
 fi
 
